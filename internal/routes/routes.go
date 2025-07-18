@@ -1,0 +1,26 @@
+package routes
+
+import (
+	"manage_restaurent/internal/handler"
+	"manage_restaurent/internal/repository"
+	"manage_restaurent/internal/service"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+	api := r.Group("/api")
+
+	customerRepo := repository.NewCustomerRepo(db)
+	customerService := service.NewCustomerService(customerRepo)
+	customerHandler := handler.NewCustomerHandler(customerService)
+
+	DepartmentRoutes(api, customerHandler)
+}

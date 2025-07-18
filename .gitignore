@@ -1,0 +1,38 @@
+# Tệp nhị phân và tệp thực thi
+# Các tệp được tạo ra khi chạy go build
+/main
+/*.exe
+/*.bin
+/dist
+/build
+
+# Tệp của IDE/Editor
+# VS Code
+.vscode/
+# Intellij / GoLand
+.idea/
+# Vim
+*.swp
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Tệp được tạo bởi hệ điều hành
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Tệp phụ thuộc và cache của Go
+# go.mod và go.sum nên được commit.
+# Các tệp cache
+*.a
+*.o
+
+# Thư mục phụ thuộc được quản lý bằng go mod vendor
+# Nếu bạn sử dụng "go mod vendor", bạn có thể bỏ comment dòng sau để bỏ qua thư mục này
+# vendor/
+
+# Tệp chứa biến môi trường
+# Dòng này cực kỳ quan trọng để bảo mật.
+# Các tệp chứa mật khẩu, API key, v.v. không bao giờ được commit lên Git.
+.env
