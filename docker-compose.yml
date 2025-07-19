@@ -19,7 +19,6 @@ services:
   be_manage_restaurent:
     build:
       context: .
-      dockerfile: Dockerfile
     ports:
       - "5000:5000"
     depends_on:
@@ -33,3 +32,11 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
+
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    volumes:
+      - ~/.n8n:/home/node/.n8n
