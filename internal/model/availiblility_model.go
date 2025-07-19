@@ -13,9 +13,9 @@ type Availibility struct {
 	ShiftId     uint           `json:"shift_id" gorm:"not null"`
 	DayOfWeek   enum.DayOfWeek `json:"day_of_week" gorm:"type:varchar(10);not null"`
 	IsAvailable bool           `json:"is_available" gorm:"default:false"`
-	Employee    Employee       `json:"employee" gorm:"foreignKey:EmployeeID"`
-	Shift       Shift          `json:"shifts" gorm:"foreignKey:ShiftID"`
+	Employee    Employee       `json:"employee" gorm:"foreignKey:EmployeeId"`
+	Shift       Shift          `json:"shifts" gorm:"foreignKey:ShiftId"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
-	DeletedAt   gorm.DeletedAt `json:"-"           gorm:"index"`
+	DeletedAt   gorm.DeletedAt `json:"-" gorm:"index"`
 }
