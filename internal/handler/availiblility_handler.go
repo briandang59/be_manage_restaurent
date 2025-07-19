@@ -32,7 +32,6 @@ func (h *AvailibilityHandler) GetAll(c *gin.Context) {
 	}
 	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
 
-	// Lấy các tham số lọc từ query string
 	filters := make(map[string]interface{})
 	if id := c.Query("id"); id != "" {
 		idInt, _ := strconv.Atoi(id)
@@ -78,7 +77,6 @@ func (h *AvailibilityHandler) GetByID(c *gin.Context) {
 }
 
 func (h *AvailibilityHandler) Create(c *gin.Context) {
-	// Hỗ trợ tạo một hoặc nhiều bản ghi
 	var availabilities []model.Availibility
 	if err := c.ShouldBindJSON(&availabilities); err != nil {
 		var availibility model.Availibility
