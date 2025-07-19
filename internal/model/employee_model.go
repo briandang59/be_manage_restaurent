@@ -19,7 +19,7 @@ type Employee struct {
 	JoinDate       string                    `json:"join_date"`
 	BaseSalary     int64                     `json:"base_salary"`
 	SalaryPerHours int64                     `json:"salary_per_hour"`
-	AccountID      uint                      `json:"account_id"`
+	AccountID      *uint                     `json:"account_id"`
 	Account        Account                   `json:"account,omitempty" gorm:"foreignKey:AccountID"`
 	CreatedAt      time.Time                 `json:"created_at"`
 	UpdatedAt      time.Time                 `json:"updated_at"`

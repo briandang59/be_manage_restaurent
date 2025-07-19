@@ -7,8 +7,8 @@ import (
 )
 
 func CustomerRoutes(rg *gin.RouterGroup, h *handler.CustomerHandler) {
-	rg.GET("/customer", h.GetAll)
-	rg.POST("/customer", h.Create)
-	rg.PUT("/customer/:id", h.Update)
-	rg.DELETE("/customer/:id", h.Delete)
+	rg.GET("/customers", h.GetAll)
+	rg.POST("/customers", h.Create)
+	rg.PUT("/customers/:id", h.Update)
+	rg.DELETE("/customers/:id", h.Delete)
 }

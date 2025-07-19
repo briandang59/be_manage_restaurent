@@ -3,6 +3,6 @@ package enum
 type EmployeeScheduleType string
 
 const (
-	Fulltime EmployeeScheduleType = "fulltime"
-	Parttime EmployeeScheduleType = "parttime"
+	FullTime EmployeeScheduleType = "FullTime"
+	PartTime EmployeeScheduleType = "PartTime"
 )
