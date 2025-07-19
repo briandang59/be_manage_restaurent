@@ -25,6 +25,8 @@ func main() {
 	if err := db.AutoMigrate(
 		&model.Customer{},
 		&model.Employee{},
+		&model.Availibility{},
+		&model.ShiftSchedule{},
 		&model.Shift{}); err != nil {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}

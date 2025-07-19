@@ -41,4 +41,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	availibilityService := service.NewAvailibilityService(availibilityRepo)
 	availibilityHandler := handler.NewAvailibilityHandler(availibilityService)
 	AvailibilityRoutes(api, availibilityHandler)
+
+	// Dependencies for ShiftSchedule
+	shiftScheduleRepo := repository.NewShiftScheduleRepo(db)
+	shiftScheduleService := service.NewShiftScheduleService(shiftScheduleRepo)
+	shiftScheduleHandler := handler.NewShiftScheduleHandler(shiftScheduleService)
+	ShiftScheduleRoutes(api, shiftScheduleHandler)
 }
