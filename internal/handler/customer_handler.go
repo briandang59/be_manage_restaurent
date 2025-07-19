@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"manage_restaurent/internal/model"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,4 +43,58 @@ func (h *CustomerHandler) GetAll(c *gin.Context) {
 		PageSize: pageSize,
 		Total:    int(total),
 	})
+}
+
+// Thêm phương thức mới cho CRUD
+func (h *CustomerHandler) Create(c *gin.Context) {
+	var customer model.Customer
+	if err := c.ShouldBindJSON(&customer); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.svc.Create(&customer); err != nil {
+		response.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.Success(c, customer, nil)
+}
+
+func (h *CustomerHandler) Update(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	var customer model.Customer
+	if err := c.ShouldBindJSON(&customer); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.svc.Update(uint(id), &customer); err != nil {
+		response.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.Success(c, "Customer updated successfully", nil)
+}
+
+func (h *CustomerHandler) Delete(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	if err := h.svc.Delete(uint(id)); err != nil {
+		response.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.Success(c, "Customer deleted successfully", nil)
 }

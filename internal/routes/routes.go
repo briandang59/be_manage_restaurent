@@ -22,5 +22,5 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	customerService := service.NewCustomerService(customerRepo)
 	customerHandler := handler.NewCustomerHandler(customerService)
 
-	DepartmentRoutes(api, customerHandler)
+	CustomerRoutes(api, customerHandler)
 }
