@@ -29,4 +29,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	shiftService := service.NewShiftService(shiftRepo)
 	shiftHandler := handler.NewShiftHandler(shiftService)
 	ShiftRoutes(api, shiftHandler)
+
+	// Dependencies for Employee
+	employeeRepo := repository.NewEmployeeRepo(db)
+	employeeService := service.NewEmployeeService(employeeRepo)
+	employeeHandler := handler.NewEmployeeHandler(employeeService)
+	EmployeeRoutes(api, employeeHandler)
 }

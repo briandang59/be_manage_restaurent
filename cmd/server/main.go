@@ -22,7 +22,10 @@ func main() {
 	db := config.ConnectDatabase()
 
 	// Auto migrate
-	if err := db.AutoMigrate(&model.Customer{}); err != nil {
+	if err := db.AutoMigrate(
+		&model.Customer{},
+		&model.Employee{},
+		&model.Shift{}); err != nil {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}
 

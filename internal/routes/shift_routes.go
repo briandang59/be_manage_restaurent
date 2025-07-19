@@ -7,9 +7,9 @@ import (
 )
 
 func ShiftRoutes(rg *gin.RouterGroup, h *handler.ShiftHandler) {
-	rg.GET("/shift", h.GetAll)
-	rg.GET("/shift/:id", h.GetByID)
-	rg.POST("/shift", h.Create)
-	rg.PATCH("/shift/:id", h.Update)
-	rg.DELETE("/shift/:id", h.Delete)
+	rg.GET("/shifts", h.GetAll)
+	rg.GET("/shifts/:id", h.GetByID)
+	rg.POST("/shifts", h.Create)
+	rg.PATCH("/shifts/:id", h.Update)
+	rg.DELETE("/shifts/:id", h.Delete)
 }
