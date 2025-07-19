@@ -15,10 +15,9 @@ func NewAvailibilityService(r repository.AvailibilityRepo) *AvailibilityService 
 	return &AvailibilityService{repo: r}
 }
 
-func (s *AvailibilityService) GetAll(page, pageSize int, preloadFields []string) ([]model.Availibility, int64, error) {
-	return s.repo.FindAll(page, pageSize, preloadFields)
+func (s *AvailibilityService) GetAll(page, pageSize int, preloadFields []string, filters map[string]interface{}) ([]model.Availibility, int64, error) {
+	return s.repo.FindAll(page, pageSize, preloadFields, filters)
 }
-
 func (s *AvailibilityService) GetByID(id uint) (*model.Availibility, error) {
 	return s.repo.FindByID(id)
 }

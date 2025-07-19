@@ -32,7 +32,22 @@ func (h *AvailibilityHandler) GetAll(c *gin.Context) {
 	}
 	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
 
-	list, total, err := h.svc.GetAll(page, pageSize, preloadFields)
+	// Lấy các tham số lọc từ query string
+	filters := make(map[string]interface{})
+	if id := c.Query("id"); id != "" {
+		idInt, _ := strconv.Atoi(id)
+		filters["id"] = idInt
+	}
+	if employeeId := c.Query("employee_id"); employeeId != "" {
+		employeeIdInt, _ := strconv.Atoi(employeeId)
+		filters["employee_id"] = employeeIdInt
+	}
+	if shiftId := c.Query("shift_id"); shiftId != "" {
+		shiftIdInt, _ := strconv.Atoi(shiftId)
+		filters["shift_id"] = shiftIdInt
+	}
+
+	list, total, err := h.svc.GetAll(page, pageSize, preloadFields, filters)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return

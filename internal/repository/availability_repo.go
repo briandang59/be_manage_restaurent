@@ -7,7 +7,7 @@ import (
 )
 
 type AvailibilityRepo interface {
-	FindAll(page, pageSize int, preloadFields []string) ([]model.Availibility, int64, error)
+	FindAll(page, pageSize int, preloadFields []string, filters map[string]interface{}) ([]model.Availibility, int64, error)
 	FindByID(id uint) (*model.Availibility, error)
 	Create(availibility *model.Availibility) error
 	BulkCreate(availibilities []model.Availibility) error
@@ -23,7 +23,7 @@ func NewAvailibilityRepo(db *gorm.DB) AvailibilityRepo {
 	return &availibilityRepo{db: db}
 }
 
-func (r *availibilityRepo) FindAll(page, pageSize int, preloadFields []string) ([]model.Availibility, int64, error) {
+func (r *availibilityRepo) FindAll(page, pageSize int, preloadFields []string, filters map[string]interface{}) ([]model.Availibility, int64, error) {
 	var list []model.Availibility
 	var total int64
 	offset := (page - 1) * pageSize
@@ -31,6 +31,17 @@ func (r *availibilityRepo) FindAll(page, pageSize int, preloadFields []string) (
 	query := r.db.Model(&model.Availibility{})
 	for _, field := range preloadFields {
 		query = query.Preload(field)
+	}
+
+	// Áp dụng các điều kiện lọc
+	if id, ok := filters["id"]; ok {
+		query = query.Where("id = ?", id)
+	}
+	if employeeId, ok := filters["employee_id"]; ok {
+		query = query.Where("employee_id = ?", employeeId)
+	}
+	if shiftId, ok := filters["shift_id"]; ok {
+		query = query.Where("shift_id = ?", shiftId)
 	}
 
 	if err := query.Count(&total).Error; err != nil {
