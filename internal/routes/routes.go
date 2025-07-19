@@ -35,4 +35,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	employeeService := service.NewEmployeeService(employeeRepo)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	EmployeeRoutes(api, employeeHandler)
+
+	// Dependencies for Availibility
+	availibilityRepo := repository.NewAvailibilityRepo(db)
+	availibilityService := service.NewAvailibilityService(availibilityRepo)
+	availibilityHandler := handler.NewAvailibilityHandler(availibilityService)
+	AvailibilityRoutes(api, availibilityHandler)
 }
