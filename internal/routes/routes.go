@@ -18,9 +18,15 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	})
 	api := r.Group("/api")
 
+	// Dependencies for Customer
 	customerRepo := repository.NewCustomerRepo(db)
 	customerService := service.NewCustomerService(customerRepo)
 	customerHandler := handler.NewCustomerHandler(customerService)
-
 	CustomerRoutes(api, customerHandler)
+
+	// Dependencies for Shift
+	shiftRepo := repository.NewShiftRepo(db)
+	shiftService := service.NewShiftService(shiftRepo)
+	shiftHandler := handler.NewShiftHandler(shiftService)
+	ShiftRoutes(api, shiftHandler)
 }
