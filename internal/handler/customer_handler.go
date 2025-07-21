@@ -45,7 +45,6 @@ func (h *CustomerHandler) GetAll(c *gin.Context) {
 	})
 }
 
-// Thêm phương thức mới cho CRUD
 func (h *CustomerHandler) Create(c *gin.Context) {
 	var customer model.Customer
 	if err := c.ShouldBindJSON(&customer); err != nil {
