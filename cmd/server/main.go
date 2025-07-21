@@ -27,6 +27,7 @@ func main() {
 		&model.Employee{},
 		&model.Availibility{},
 		&model.ShiftSchedule{},
+		&model.Table{},
 		&model.Shift{}); err != nil {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}

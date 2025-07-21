@@ -5,12 +5,10 @@ import (
 	"manage_restaurent/internal/repository"
 )
 
-// AvailibilityService định nghĩa các phương thức dịch vụ cho Availibility
 type AvailibilityService struct {
 	repo repository.AvailibilityRepo
 }
 
-// NewAvailibilityService tạo một thể hiện mới của AvailibilityService
 func NewAvailibilityService(r repository.AvailibilityRepo) *AvailibilityService {
 	return &AvailibilityService{repo: r}
 }

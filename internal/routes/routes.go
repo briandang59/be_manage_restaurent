@@ -47,4 +47,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	shiftScheduleService := service.NewShiftScheduleService(shiftScheduleRepo)
 	shiftScheduleHandler := handler.NewShiftScheduleHandler(shiftScheduleService)
 	ShiftScheduleRoutes(api, shiftScheduleHandler)
+
+	TableRepo := repository.NewTableRepo(db)
+	TableSVC := service.NewTableService(TableRepo)
+	TableHandler := handler.NewTableHandler(TableSVC)
+	TableRoutes(api, TableHandler)
 }
