@@ -52,4 +52,58 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	TableSVC := service.NewTableService(TableRepo)
 	TableHandler := handler.NewTableHandler(TableSVC)
 	TableRoutes(api, TableHandler)
+
+	// Dependencies for Account
+	accountRepo := repository.NewAccountRepo(db)
+	accountService := service.NewAccountService(accountRepo)
+	accountHandler := handler.NewAccountHandler(accountService)
+	AccountRoutes(api, accountHandler)
+
+	// Dependencies for Role
+	roleRepo := repository.NewRoleRepo(db)
+	roleService := service.NewRoleService(roleRepo)
+	roleHandler := handler.NewRoleHandler(roleService)
+	RoleRoutes(api, roleHandler)
+
+	// Dependencies for Permission
+	permissionRepo := repository.NewPermissionRepo(db)
+	permissionService := service.NewPermissionService(permissionRepo)
+	permissionHandler := handler.NewPermissionHandler(permissionService)
+	PermissionRoutes(api, permissionHandler)
+
+	// Dependencies for Ticket
+	ticketRepo := repository.NewTicketRepo(db)
+	ticketService := service.NewTicketService(ticketRepo)
+	ticketHandler := handler.NewTicketHandler(ticketService)
+	TicketRoutes(api, ticketHandler)
+
+	// Dependencies for Ingredient
+	ingredientRepo := repository.NewIngredientRepo(db)
+	ingredientService := service.NewIngredientService(ingredientRepo)
+	ingredientHandler := handler.NewIngredientHandler(ingredientService)
+	IngredientRoutes(api, ingredientHandler)
+
+	// Dependencies for Attendance
+	attendanceRepo := repository.NewAttendanceRepo(db)
+	attendanceService := service.NewAttendanceService(attendanceRepo)
+	attendanceHandler := handler.NewAttendanceHandler(attendanceService)
+	AttendanceRoutes(api, attendanceHandler)
+
+	// Dependencies for OrderItem
+	orderItemRepo := repository.NewOrderItemRepo(db)
+	orderItemService := service.NewOrderItemService(orderItemRepo)
+	orderItemHandler := handler.NewOrderItemHandler(orderItemService)
+	OrderItemRoutes(api, orderItemHandler)
+
+	// Dependencies for Order
+	orderRepo := repository.NewOrderRepo(db)
+	orderService := service.NewOrderService(orderRepo)
+	orderHandler := handler.NewOrderHandler(orderService)
+	OrderRoutes(api, orderHandler)
+
+	// Dependencies for MenuItem
+	menuItemRepo := repository.NewMenuItemRepo(db)
+	menuItemService := service.NewMenuItemService(menuItemRepo)
+	menuItemHandler := handler.NewMenuItemHandler(menuItemService)
+	MenuItemRoutes(api, menuItemHandler)
 }
