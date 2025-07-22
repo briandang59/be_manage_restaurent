@@ -7,13 +7,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type Ticker struct {
+type Ticket struct {
 	ID           uint            `json:"id" gorm:"primaryKey"`
-	IngredientId uint            `json:"ingredient_id"`
+	IngredientId uint            `json:"ingredient_id" gorm:"not null"`
 	Quantity     int64           `json:"quantity"`
-	Unit         int64           `json:"unit"`
+	Unit         string          `json:"unit" gorm:"not null"`
 	TicketType   enum.TicketType `json:"ticket_type"`
 	CreatedAt    time.Time       `json:"created_at"`
 	UpdatedAt    time.Time       `json:"updated_at"`
-	DeletedAt    gorm.DeletedAt  `json:"-"           gorm:"index"`
+	DeletedAt    gorm.DeletedAt  `json:"-" gorm:"index"`
 }

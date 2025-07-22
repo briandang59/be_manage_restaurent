@@ -20,8 +20,10 @@ type Employee struct {
 	BaseSalary     int64                     `json:"base_salary"`
 	SalaryPerHours int64                     `json:"salary_per_hour"`
 	AccountID      *uint                     `json:"account_id"`
-	Account        *Account                   `json:"account,omitempty" gorm:"foreignKey:AccountID"`
+	Account        *Account                  `json:"account,omitempty" gorm:"foreignKey:AccountID"`
+	AvatarFileID   *uint                     `json:"avatar_file_id"`
+	AvatarFile     *File                     `json:"avatar_file,omitempty" gorm:"foreignKey:AvatarFileID"`
 	CreatedAt      time.Time                 `json:"created_at"`
 	UpdatedAt      time.Time                 `json:"updated_at"`
-	DeletedAt      gorm.DeletedAt            `json:"-"           gorm:"index"`
+	DeletedAt      gorm.DeletedAt            `json:"-" gorm:"index"`
 }

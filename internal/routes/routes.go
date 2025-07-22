@@ -2,6 +2,7 @@ package routes
 
 import (
 	"manage_restaurent/internal/handler"
+	"manage_restaurent/internal/middleware"
 	"manage_restaurent/internal/repository"
 	"manage_restaurent/internal/service"
 	"net/http"
@@ -16,7 +17,14 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			"message": "pong",
 		})
 	})
-	api := r.Group("/api")
+	api := r.Group("/api", middleware.AuthMiddleware())
+	noAuth := r.Group("/auth")
+
+	// Dependencies for Account
+	accountRepo := repository.NewAccountRepo(db)
+	accountService := service.NewAccountService(accountRepo)
+	accountHandler := handler.NewAccountHandler(accountService)
+	AccountRoutes(noAuth, accountHandler)
 
 	// Dependencies for Customer
 	customerRepo := repository.NewCustomerRepo(db)
@@ -53,11 +61,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	TableHandler := handler.NewTableHandler(TableSVC)
 	TableRoutes(api, TableHandler)
 
-	// Dependencies for Account
-	accountRepo := repository.NewAccountRepo(db)
-	accountService := service.NewAccountService(accountRepo)
-	accountHandler := handler.NewAccountHandler(accountService)
-	AccountRoutes(api, accountHandler)
+
 
 	// Dependencies for Role
 	roleRepo := repository.NewRoleRepo(db)
