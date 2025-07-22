@@ -84,7 +84,7 @@ func (h *TicketHandler) GetByID(c *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse
 // @Router /tickets [post]
 func (h *TicketHandler) Create(c *gin.Context) {
-	var ticket model.Ticker
+	var ticket model.Ticket
 	if err := c.ShouldBindJSON(&ticket); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
 		return

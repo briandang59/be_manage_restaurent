@@ -2,13 +2,14 @@ package routes
 
 import (
 	"manage_restaurent/internal/handler"
-	"manage_restaurent/internal/middleware"
 	"manage_restaurent/internal/repository"
 	"manage_restaurent/internal/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+
+	"manage_restaurent/internal/middlewares"
 )
 
 func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
@@ -17,7 +18,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 			"message": "pong",
 		})
 	})
-	api := r.Group("/api", middleware.AuthMiddleware())
+	api := r.Group("/api", middlewares.AuthMiddleware())
 	noAuth := r.Group("/auth")
 
 	// Dependencies for Account
@@ -61,7 +62,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	TableHandler := handler.NewTableHandler(TableSVC)
 	TableRoutes(api, TableHandler)
 
-
+	fileRepo := repository.NewFileRepo(db)
+	fileHandler := handler.NewFileHandler(fileRepo)
+	api.POST("/files/upload", fileHandler.UploadFile)
 
 	// Dependencies for Role
 	roleRepo := repository.NewRoleRepo(db)

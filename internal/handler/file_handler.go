@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/response"
+	"manage_restaurent/internal/repository"
 	"net/http"
 	"os"
 
@@ -13,7 +14,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type FileHandler struct{}
+type FileHandler struct {
+	repo *repository.FileRepo
+}
+
+func NewFileHandler(repo *repository.FileRepo) *FileHandler {
+	return &FileHandler{repo: repo}
+}
 
 // UploadFile godoc
 // @Summary Upload file
@@ -65,15 +72,10 @@ func (h *FileHandler) UploadFile(c *gin.Context) {
 		Size:         file.Size,
 		PublicID:     uploadResult.PublicID,
 		ResourceType: uploadResult.ResourceType,
-		Folder:       uploadResult.Folder,
 	}
-	// Lưu vào DB (giả sử có h.repo kiểu repository.FileRepo)
-	if h.repo != nil {
-		err = h.repo.Create(&fileModel)
-		if err != nil {
-			response.Error(c, http.StatusInternalServerError, "Lưu file vào DB lỗi")
-			return
-		}
+	if err := h.repo.Create(&fileModel); err != nil {
+		response.Error(c, http.StatusInternalServerError, "Lưu file vào DB lỗi")
+		return
 	}
 	response.Success(c, fileModel, nil)
 }
