@@ -21,6 +21,15 @@ func NewShiftScheduleHandler(s *service.ShiftScheduleService) *ShiftScheduleHand
 	return &ShiftScheduleHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách lịch ca làm việc
+// @Description Lấy danh sách lịch ca làm việc
+// @Tags shiftschedule
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.ShiftSchedule}
+// @Router /shifts-chedules [get]
 func (h *ShiftScheduleHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -45,6 +54,15 @@ func (h *ShiftScheduleHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết lịch ca làm việc
+// @Description Lấy chi tiết một lịch ca làm việc theo ID
+// @Tags shiftschedule
+// @Produce json
+// @Param id path int true "ID shift schedule"
+// @Success 200 {object} model.ShiftSchedule
+// @Failure 404 {object} response.ErrorResponse
+// @Router /shifts-chedules/{id} [get]
 func (h *ShiftScheduleHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -62,6 +80,16 @@ func (h *ShiftScheduleHandler) GetByID(c *gin.Context) {
 	response.Success(c, shiftSchedule, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới lịch ca làm việc
+// @Description Tạo mới một hoặc nhiều lịch ca làm việc
+// @Tags shiftschedule
+// @Accept json
+// @Produce json
+// @Param shiftSchedules body []model.ShiftSchedule true "Dữ liệu lịch ca làm việc" example([{ "employee_id": 1, "shift_id": 2, "date": "2024-07-22" }])
+// @Success 200 {object} []model.ShiftSchedule
+// @Failure 400 {object} response.ErrorResponse
+// @Router /shifts-chedules [post]
 func (h *ShiftScheduleHandler) Create(c *gin.Context) {
 	var shiftSchedules []model.ShiftSchedule
 	if err := c.ShouldBindJSON(&shiftSchedules); err != nil {
@@ -81,6 +109,17 @@ func (h *ShiftScheduleHandler) Create(c *gin.Context) {
 	response.Success(c, shiftSchedules, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật lịch ca làm việc
+// @Description Cập nhật thông tin lịch ca làm việc
+// @Tags shiftschedule
+// @Accept json
+// @Produce json
+// @Param id path int true "ID shift schedule"
+// @Param updates body object true "Dữ liệu cập nhật" example({"date":"2024-07-23"})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /shifts-chedules/{id} [patch]
 func (h *ShiftScheduleHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -100,6 +139,15 @@ func (h *ShiftScheduleHandler) Update(c *gin.Context) {
 	response.Success(c, "ShiftSchedule updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa lịch ca làm việc
+// @Description Xóa một lịch ca làm việc
+// @Tags shiftschedule
+// @Produce json
+// @Param id path int true "ID shift schedule"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /shifts-chedules/{id} [delete]
 func (h *ShiftScheduleHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

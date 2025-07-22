@@ -10,8 +10,17 @@ import (
 	"manage_restaurent/config"
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/routes"
+
+	docs "manage_restaurent/docs"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/files"
 )
 
+// @title Restaurant Management API
+// @version 1.0
+// @description API quản lý nhà hàng, nhân viên, thực đơn, đơn hàng, file upload...
+// @host localhost:8080
+// @BasePath /api
 func main() {
 	// Load biến môi trường từ file .env
 	if err := godotenv.Load(".env"); err != nil {
@@ -28,12 +37,27 @@ func main() {
 		&model.Availibility{},
 		&model.ShiftSchedule{},
 		&model.Table{},
-		&model.Shift{}); err != nil {
+		&model.Shift{},
+		&model.MenuItem{},
+		&model.Account{},
+		&model.Role{},
+		&model.Permission{},
+		&model.Ticket{},
+		&model.Ingredient{},
+		&model.Attendance{},
+		&model.OrderItem{},
+		&model.Order{},
+		&model.File{},
+	); err != nil {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}
 
 	// Tạo router
 	r := gin.Default()
+
+	// Swagger endpoint
+	docs.SwaggerInfo.BasePath = "/api"
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Đăng ký route
 	routes.RegisterRoutes(r, db)

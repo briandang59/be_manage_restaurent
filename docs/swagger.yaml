@@ -1,0 +1,2390 @@
+basePath: /api
+definitions:
+  enum.DayOfWeek:
+    enum:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+    type: string
+    x-enum-varnames:
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    - Sunday
+  enum.EmployeeScheduleType:
+    enum:
+    - FullTime
+    - PartTime
+    type: string
+    x-enum-varnames:
+    - FullTime
+    - PartTime
+  enum.MenuItem:
+    enum:
+    - Stop
+    - Available
+    - Out of season
+    type: string
+    x-enum-varnames:
+    - Stop
+    - Available
+    - OutOfSeason
+  enum.OrderEnum:
+    enum:
+    - Paid
+    - UnPaid
+    - Having Meal
+    type: string
+    x-enum-varnames:
+    - Paid
+    - UnPaid
+    - HavingMeal
+  enum.TicketType:
+    enum:
+    - Import
+    - Export
+    type: string
+    x-enum-varnames:
+    - Import
+    - Export
+  model.Account:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      role:
+        $ref: '#/definitions/model.Role'
+      role_id:
+        type: integer
+      updated_at:
+        type: string
+      user_name:
+        type: string
+    type: object
+  model.Attendance:
+    properties:
+      actual_end_time:
+        type: string
+      actual_start_time:
+        type: string
+      created_at:
+        type: string
+      hours:
+        type: integer
+      id:
+        type: integer
+      shift_schedule:
+        $ref: '#/definitions/model.ShiftSchedule'
+      shift_schedule_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  model.Availibility:
+    properties:
+      created_at:
+        type: string
+      day_of_week:
+        $ref: '#/definitions/enum.DayOfWeek'
+      employee:
+        $ref: '#/definitions/model.Employee'
+      employee_id:
+        type: integer
+      id:
+        type: integer
+      is_available:
+        type: boolean
+      shift_id:
+        type: integer
+      shifts:
+        $ref: '#/definitions/model.Shift'
+      updated_at:
+        type: string
+    type: object
+  model.Customer:
+    properties:
+      created_at:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      phone_number:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.Employee:
+    properties:
+      account:
+        $ref: '#/definitions/model.Account'
+      account_id:
+        type: integer
+      address:
+        type: string
+      avatar_file:
+        $ref: '#/definitions/model.File'
+      avatar_file_id:
+        type: integer
+      base_salary:
+        type: integer
+      birthday:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      gender:
+        type: boolean
+      id:
+        type: integer
+      join_date:
+        type: string
+      phone_number:
+        type: string
+      salary_per_hour:
+        type: integer
+      schedule_type:
+        $ref: '#/definitions/enum.EmployeeScheduleType'
+      updated_at:
+        type: string
+    type: object
+  model.File:
+    properties:
+      created_at:
+        type: string
+      file_name:
+        type: string
+      id:
+        type: integer
+      mime_type:
+        type: string
+      size:
+        type: integer
+      updated_at:
+        type: string
+      url:
+        type: string
+    type: object
+  model.Ingredient:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      quantity:
+        type: integer
+      supplier:
+        type: string
+      unit:
+        type: string
+      updated_at:
+        type: string
+      warning_quantity:
+        type: integer
+    type: object
+  model.MenuItem:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      file:
+        $ref: '#/definitions/model.File'
+      file_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      status:
+        $ref: '#/definitions/enum.MenuItem'
+      updated_at:
+        type: string
+    type: object
+  model.Order:
+    properties:
+      amount:
+        type: integer
+      created_at:
+        type: string
+      customer:
+        $ref: '#/definitions/model.Customer'
+      customer_id:
+        type: integer
+      id:
+        type: integer
+      memo:
+        type: string
+      status:
+        $ref: '#/definitions/enum.OrderEnum'
+      table:
+        $ref: '#/definitions/model.Table'
+      table_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  model.OrderItem:
+    properties:
+      amount:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      memo:
+        type: string
+      menu_item_id:
+        type: integer
+      order:
+        $ref: '#/definitions/model.Order'
+      order_id:
+        type: integer
+      quantity:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  model.Permission:
+    properties:
+      id:
+        type: integer
+      permission_name:
+        type: string
+    type: object
+  model.Role:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      permissions:
+        items:
+          $ref: '#/definitions/model.Permission'
+        type: array
+      role_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.Shift:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      end_time:
+        type: string
+      id:
+        type: integer
+      shift_name:
+        type: string
+      start_time:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.ShiftSchedule:
+    properties:
+      created_at:
+        type: string
+      date:
+        type: string
+      employee:
+        $ref: '#/definitions/model.Employee'
+      employee_id:
+        type: integer
+      id:
+        type: integer
+      shift:
+        $ref: '#/definitions/model.Shift'
+      shift_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  model.Table:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      memo:
+        type: string
+      position:
+        type: string
+      seats:
+        type: integer
+      table_name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.Ticket:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      ingredient_id:
+        type: integer
+      quantity:
+        type: integer
+      ticket_type:
+        $ref: '#/definitions/enum.TicketType'
+      unit:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  response.Body:
+    properties:
+      code:
+        example: 200
+        type: integer
+      data: {}
+      message:
+        example: success
+        type: string
+      pagination:
+        $ref: '#/definitions/response.Pagination'
+    type: object
+  response.ErrorResponse:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: error message
+        type: string
+    type: object
+  response.Pagination:
+    properties:
+      page:
+        example: 1
+        type: integer
+      page_size:
+        example: 10
+        type: integer
+      total:
+        example: 100
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API quản lý nhà hàng, nhân viên, thực đơn, đơn hàng, file upload...
+  title: Restaurant Management API
+  version: "1.0"
+paths:
+  /accounts:
+    get:
+      description: Lấy danh sách tài khoản
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Account'
+                  type: array
+              type: object
+      summary: Lấy danh sách tài khoản
+      tags:
+      - account
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một tài khoản
+      parameters:
+      - description: Dữ liệu tài khoản
+        in: body
+        name: account
+        required: true
+        schema:
+          $ref: '#/definitions/model.Account'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Account'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới tài khoản
+      tags:
+      - account
+  /accounts/{id}:
+    delete:
+      description: Xóa một tài khoản
+      parameters:
+      - description: ID tài khoản
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa tài khoản
+      tags:
+      - account
+    get:
+      description: Lấy chi tiết một tài khoản theo ID
+      parameters:
+      - description: ID tài khoản
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Account'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết tài khoản
+      tags:
+      - account
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin một tài khoản
+      parameters:
+      - description: ID tài khoản
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật tài khoản
+      tags:
+      - account
+  /accounts/login:
+    post:
+      consumes:
+      - application/json
+      description: Đăng nhập tài khoản, trả về JWT token
+      parameters:
+      - description: Thông tin đăng nhập
+        in: body
+        name: login
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Đăng nhập
+      tags:
+      - account
+  /attendances:
+    get:
+      description: Lấy danh sách chấm công
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Attendance'
+                  type: array
+              type: object
+      summary: Lấy danh sách chấm công
+      tags:
+      - attendance
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một bản ghi chấm công
+      parameters:
+      - description: Dữ liệu chấm công
+        in: body
+        name: attendance
+        required: true
+        schema:
+          $ref: '#/definitions/model.Attendance'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Attendance'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới chấm công
+      tags:
+      - attendance
+  /attendances/{id}:
+    delete:
+      description: Xóa một bản ghi chấm công
+      parameters:
+      - description: ID chấm công
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa chấm công
+      tags:
+      - attendance
+    get:
+      description: Lấy chi tiết một bản ghi chấm công theo ID
+      parameters:
+      - description: ID chấm công
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Attendance'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết chấm công
+      tags:
+      - attendance
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin một bản ghi chấm công
+      parameters:
+      - description: ID chấm công
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật chấm công
+      tags:
+      - attendance
+  /availibilities:
+    get:
+      description: Lấy danh sách availibility
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Availibility'
+                  type: array
+              type: object
+      summary: Lấy danh sách availibility
+      tags:
+      - availibility
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một availibility
+      parameters:
+      - description: Dữ liệu availibility
+        in: body
+        name: availibility
+        required: true
+        schema:
+          $ref: '#/definitions/model.Availibility'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Availibility'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới availibility
+      tags:
+      - availibility
+  /availibilities/{id}:
+    delete:
+      description: Xóa một availibility
+      parameters:
+      - description: ID availibility
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa availibility
+      tags:
+      - availibility
+    get:
+      description: Lấy chi tiết một availibility theo ID
+      parameters:
+      - description: ID availibility
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Availibility'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết availibility
+      tags:
+      - availibility
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin availibility
+      parameters:
+      - description: ID availibility
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật availibility
+      tags:
+      - availibility
+  /customers:
+    get:
+      description: Lấy danh sách khách hàng
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Customer'
+                  type: array
+              type: object
+      summary: Lấy danh sách khách hàng
+      tags:
+      - customer
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một khách hàng
+      parameters:
+      - description: Dữ liệu khách hàng
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.Customer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới khách hàng
+      tags:
+      - customer
+  /customers/{id}:
+    delete:
+      description: Xóa một khách hàng
+      parameters:
+      - description: ID khách hàng
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa khách hàng
+      tags:
+      - customer
+    put:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin khách hàng
+      parameters:
+      - description: ID khách hàng
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/model.Customer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật khách hàng
+      tags:
+      - customer
+  /employees:
+    get:
+      description: Lấy danh sách nhân viên
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Employee'
+                  type: array
+              type: object
+      summary: Lấy danh sách nhân viên
+      tags:
+      - employee
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một nhân viên
+      parameters:
+      - description: Dữ liệu nhân viên
+        in: body
+        name: employee
+        required: true
+        schema:
+          $ref: '#/definitions/model.Employee'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Employee'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới nhân viên
+      tags:
+      - employee
+  /employees/{id}:
+    delete:
+      description: Xóa một nhân viên
+      parameters:
+      - description: ID nhân viên
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa nhân viên
+      tags:
+      - employee
+    get:
+      description: Lấy chi tiết một nhân viên theo ID
+      parameters:
+      - description: ID nhân viên
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Employee'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết nhân viên
+      tags:
+      - employee
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin một nhân viên
+      parameters:
+      - description: ID nhân viên
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật nhân viên
+      tags:
+      - employee
+  /files/{id}:
+    delete:
+      description: Xóa một file theo ID
+      parameters:
+      - description: ID file
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa file
+      tags:
+      - file
+    get:
+      description: Lấy thông tin file theo ID
+      parameters:
+      - description: ID file
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.File'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy thông tin file
+      tags:
+      - file
+  /files/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload file (hình ảnh, tài liệu...)
+      parameters:
+      - description: File upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.File'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Upload file
+      tags:
+      - file
+  /ingredients:
+    get:
+      description: Lấy danh sách nguyên liệu
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Ingredient'
+                  type: array
+              type: object
+      summary: Lấy danh sách nguyên liệu
+      tags:
+      - ingredient
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một nguyên liệu
+      parameters:
+      - description: Dữ liệu nguyên liệu
+        in: body
+        name: ingredient
+        required: true
+        schema:
+          $ref: '#/definitions/model.Ingredient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Ingredient'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới nguyên liệu
+      tags:
+      - ingredient
+  /ingredients/{id}:
+    delete:
+      description: Xóa một nguyên liệu
+      parameters:
+      - description: ID nguyên liệu
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa nguyên liệu
+      tags:
+      - ingredient
+    get:
+      description: Lấy chi tiết một nguyên liệu theo ID
+      parameters:
+      - description: ID nguyên liệu
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Ingredient'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết nguyên liệu
+      tags:
+      - ingredient
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin một nguyên liệu
+      parameters:
+      - description: ID nguyên liệu
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật nguyên liệu
+      tags:
+      - ingredient
+  /menu-items:
+    get:
+      description: Lấy danh sách các món ăn trong thực đơn
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.MenuItem'
+                  type: array
+              type: object
+      summary: Lấy danh sách menu item
+      tags:
+      - menuitem
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một món ăn trong thực đơn
+      parameters:
+      - description: Dữ liệu menu item
+        in: body
+        name: menuItem
+        required: true
+        schema:
+          $ref: '#/definitions/model.MenuItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MenuItem'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới menu item
+      tags:
+      - menuitem
+  /menu-items/{id}:
+    delete:
+      description: Xóa một món ăn khỏi thực đơn
+      parameters:
+      - description: ID menu item
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa menu item
+      tags:
+      - menuitem
+    get:
+      description: Lấy chi tiết một món ăn theo ID
+      parameters:
+      - description: ID menu item
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MenuItem'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết menu item
+      tags:
+      - menuitem
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin một món ăn
+      parameters:
+      - description: ID menu item
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật menu item
+      tags:
+      - menuitem
+  /order-items:
+    get:
+      description: Lấy danh sách các món trong đơn hàng
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.OrderItem'
+                  type: array
+              type: object
+      summary: Lấy danh sách order item
+      tags:
+      - orderitem
+    post:
+      consumes:
+      - application/json
+      description: Thêm món vào đơn hàng
+      parameters:
+      - description: Dữ liệu order item
+        in: body
+        name: orderItem
+        required: true
+        schema:
+          $ref: '#/definitions/model.OrderItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OrderItem'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới order item
+      tags:
+      - orderitem
+  /order-items/{id}:
+    delete:
+      description: Xóa một món khỏi đơn hàng
+      parameters:
+      - description: ID order item
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa order item
+      tags:
+      - orderitem
+    get:
+      description: Lấy chi tiết một món trong đơn hàng theo ID
+      parameters:
+      - description: ID order item
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.OrderItem'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết order item
+      tags:
+      - orderitem
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin món trong đơn hàng
+      parameters:
+      - description: ID order item
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật order item
+      tags:
+      - orderitem
+  /orders:
+    get:
+      description: Lấy danh sách đơn hàng
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Order'
+                  type: array
+              type: object
+      summary: Lấy danh sách order
+      tags:
+      - order
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một đơn hàng
+      parameters:
+      - description: Dữ liệu order
+        in: body
+        name: order
+        required: true
+        schema:
+          $ref: '#/definitions/model.Order'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới order
+      tags:
+      - order
+  /orders/{id}:
+    delete:
+      description: Xóa một đơn hàng
+      parameters:
+      - description: ID order
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa order
+      tags:
+      - order
+    get:
+      description: Lấy chi tiết một đơn hàng theo ID
+      parameters:
+      - description: ID order
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Order'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết order
+      tags:
+      - order
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin đơn hàng
+      parameters:
+      - description: ID order
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật order
+      tags:
+      - order
+  /permissions:
+    get:
+      description: Lấy danh sách quyền
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Permission'
+                  type: array
+              type: object
+      summary: Lấy danh sách permission
+      tags:
+      - permission
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một quyền
+      parameters:
+      - description: Dữ liệu permission
+        in: body
+        name: permission
+        required: true
+        schema:
+          $ref: '#/definitions/model.Permission'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Permission'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới permission
+      tags:
+      - permission
+  /permissions/{id}:
+    delete:
+      description: Xóa một quyền
+      parameters:
+      - description: ID permission
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa permission
+      tags:
+      - permission
+    get:
+      description: Lấy chi tiết một quyền theo ID
+      parameters:
+      - description: ID permission
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Permission'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết permission
+      tags:
+      - permission
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin một quyền
+      parameters:
+      - description: ID permission
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật permission
+      tags:
+      - permission
+  /roles:
+    get:
+      description: Lấy danh sách quyền
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Role'
+                  type: array
+              type: object
+      summary: Lấy danh sách role
+      tags:
+      - role
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một quyền
+      parameters:
+      - description: Dữ liệu role
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/model.Role'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Role'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới role
+      tags:
+      - role
+  /roles/{id}:
+    delete:
+      description: Xóa một quyền
+      parameters:
+      - description: ID role
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa role
+      tags:
+      - role
+    get:
+      description: Lấy chi tiết một quyền theo ID
+      parameters:
+      - description: ID role
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Role'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết role
+      tags:
+      - role
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin một quyền
+      parameters:
+      - description: ID role
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật role
+      tags:
+      - role
+  /shifts:
+    get:
+      description: Lấy danh sách ca làm việc
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Shift'
+                  type: array
+              type: object
+      summary: Lấy danh sách ca làm việc
+      tags:
+      - shift
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một ca làm việc
+      parameters:
+      - description: Dữ liệu ca làm việc
+        in: body
+        name: shift
+        required: true
+        schema:
+          $ref: '#/definitions/model.Shift'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Shift'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới ca làm việc
+      tags:
+      - shift
+  /shifts-chedules:
+    get:
+      description: Lấy danh sách lịch ca làm việc
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.ShiftSchedule'
+                  type: array
+              type: object
+      summary: Lấy danh sách lịch ca làm việc
+      tags:
+      - shiftschedule
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một hoặc nhiều lịch ca làm việc
+      parameters:
+      - description: Dữ liệu lịch ca làm việc
+        in: body
+        name: shiftSchedules
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/model.ShiftSchedule'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ShiftSchedule'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới lịch ca làm việc
+      tags:
+      - shiftschedule
+  /shifts-chedules/{id}:
+    delete:
+      description: Xóa một lịch ca làm việc
+      parameters:
+      - description: ID shift schedule
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa lịch ca làm việc
+      tags:
+      - shiftschedule
+    get:
+      description: Lấy chi tiết một lịch ca làm việc theo ID
+      parameters:
+      - description: ID shift schedule
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ShiftSchedule'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết lịch ca làm việc
+      tags:
+      - shiftschedule
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin lịch ca làm việc
+      parameters:
+      - description: ID shift schedule
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật lịch ca làm việc
+      tags:
+      - shiftschedule
+  /shifts/{id}:
+    delete:
+      description: Xóa một ca làm việc
+      parameters:
+      - description: ID shift
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa ca làm việc
+      tags:
+      - shift
+    get:
+      description: Lấy chi tiết một ca làm việc theo ID
+      parameters:
+      - description: ID shift
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Shift'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết ca làm việc
+      tags:
+      - shift
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin ca làm việc
+      parameters:
+      - description: ID shift
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật ca làm việc
+      tags:
+      - shift
+  /tables:
+    get:
+      description: Lấy danh sách bàn trong nhà hàng
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Table'
+                  type: array
+              type: object
+      summary: Lấy danh sách bàn
+      tags:
+      - table
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một bàn
+      parameters:
+      - description: Dữ liệu bàn
+        in: body
+        name: table
+        required: true
+        schema:
+          $ref: '#/definitions/model.Table'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Table'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới bàn
+      tags:
+      - table
+  /tables/{id}:
+    delete:
+      description: Xóa một bàn
+      parameters:
+      - description: ID bàn
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa bàn
+      tags:
+      - table
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin bàn
+      parameters:
+      - description: ID bàn
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật bàn
+      tags:
+      - table
+  /tickets:
+    get:
+      description: Lấy danh sách phiếu nhập/xuất kho
+      parameters:
+      - description: Trang
+        in: query
+        name: page
+        type: integer
+      - description: Số lượng mỗi trang
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Body'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Ticket'
+                  type: array
+              type: object
+      summary: Lấy danh sách ticket
+      tags:
+      - ticket
+    post:
+      consumes:
+      - application/json
+      description: Tạo mới một phiếu nhập/xuất kho
+      parameters:
+      - description: Dữ liệu ticket
+        in: body
+        name: ticket
+        required: true
+        schema:
+          $ref: '#/definitions/model.Ticket'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Ticket'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Tạo mới ticket
+      tags:
+      - ticket
+  /tickets/{id}:
+    delete:
+      description: Xóa một phiếu
+      parameters:
+      - description: ID ticket
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Xóa ticket
+      tags:
+      - ticket
+    get:
+      description: Lấy chi tiết một phiếu theo ID
+      parameters:
+      - description: ID ticket
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Ticket'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Lấy chi tiết ticket
+      tags:
+      - ticket
+    patch:
+      consumes:
+      - application/json
+      description: Cập nhật thông tin một phiếu
+      parameters:
+      - description: ID ticket
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dữ liệu cập nhật
+        in: body
+        name: updates
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Body'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Cập nhật ticket
+      tags:
+      - ticket
+swagger: "2.0"

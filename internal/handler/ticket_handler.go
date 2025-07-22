@@ -18,6 +18,15 @@ func NewTicketHandler(s *service.TicketService) *TicketHandler {
 	return &TicketHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách ticket
+// @Description Lấy danh sách phiếu nhập/xuất kho
+// @Tags ticket
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.Ticket}
+// @Router /tickets [get]
 func (h *TicketHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -40,6 +49,15 @@ func (h *TicketHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết ticket
+// @Description Lấy chi tiết một phiếu theo ID
+// @Tags ticket
+// @Produce json
+// @Param id path int true "ID ticket"
+// @Success 200 {object} model.Ticket
+// @Failure 404 {object} response.ErrorResponse
+// @Router /tickets/{id} [get]
 func (h *TicketHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -55,6 +73,16 @@ func (h *TicketHandler) GetByID(c *gin.Context) {
 	response.Success(c, ticket, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới ticket
+// @Description Tạo mới một phiếu nhập/xuất kho
+// @Tags ticket
+// @Accept json
+// @Produce json
+// @Param ticket body model.Ticket true "Dữ liệu ticket" example({"ingredient_id":1,"quantity":10,"unit":"kg","ticket_type":"IMPORT"})
+// @Success 200 {object} model.Ticket
+// @Failure 400 {object} response.ErrorResponse
+// @Router /tickets [post]
 func (h *TicketHandler) Create(c *gin.Context) {
 	var ticket model.Ticker
 	if err := c.ShouldBindJSON(&ticket); err != nil {
@@ -68,6 +96,17 @@ func (h *TicketHandler) Create(c *gin.Context) {
 	response.Success(c, ticket, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật ticket
+// @Description Cập nhật thông tin một phiếu
+// @Tags ticket
+// @Accept json
+// @Produce json
+// @Param id path int true "ID ticket"
+// @Param updates body object true "Dữ liệu cập nhật" example({"quantity":20})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /tickets/{id} [patch]
 func (h *TicketHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -87,6 +126,15 @@ func (h *TicketHandler) Update(c *gin.Context) {
 	response.Success(c, "Ticket updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa ticket
+// @Description Xóa một phiếu
+// @Tags ticket
+// @Produce json
+// @Param id path int true "ID ticket"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /tickets/{id} [delete]
 func (h *TicketHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

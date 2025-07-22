@@ -18,6 +18,15 @@ func NewPermissionHandler(s *service.PermissionService) *PermissionHandler {
 	return &PermissionHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách permission
+// @Description Lấy danh sách quyền
+// @Tags permission
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.Permission}
+// @Router /permissions [get]
 func (h *PermissionHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -40,6 +49,15 @@ func (h *PermissionHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết permission
+// @Description Lấy chi tiết một quyền theo ID
+// @Tags permission
+// @Produce json
+// @Param id path int true "ID permission"
+// @Success 200 {object} model.Permission
+// @Failure 404 {object} response.ErrorResponse
+// @Router /permissions/{id} [get]
 func (h *PermissionHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -55,6 +73,16 @@ func (h *PermissionHandler) GetByID(c *gin.Context) {
 	response.Success(c, permission, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới permission
+// @Description Tạo mới một quyền
+// @Tags permission
+// @Accept json
+// @Produce json
+// @Param permission body model.Permission true "Dữ liệu permission" example({"permission_name":"view_menu"})
+// @Success 200 {object} model.Permission
+// @Failure 400 {object} response.ErrorResponse
+// @Router /permissions [post]
 func (h *PermissionHandler) Create(c *gin.Context) {
 	var permission model.Permission
 	if err := c.ShouldBindJSON(&permission); err != nil {
@@ -68,6 +96,17 @@ func (h *PermissionHandler) Create(c *gin.Context) {
 	response.Success(c, permission, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật permission
+// @Description Cập nhật thông tin một quyền
+// @Tags permission
+// @Accept json
+// @Produce json
+// @Param id path int true "ID permission"
+// @Param updates body object true "Dữ liệu cập nhật" example({"permission_name":"edit_menu"})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /permissions/{id} [patch]
 func (h *PermissionHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -87,6 +126,15 @@ func (h *PermissionHandler) Update(c *gin.Context) {
 	response.Success(c, "Permission updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa permission
+// @Description Xóa một quyền
+// @Tags permission
+// @Produce json
+// @Param id path int true "ID permission"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /permissions/{id} [delete]
 func (h *PermissionHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

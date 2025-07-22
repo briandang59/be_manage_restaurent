@@ -18,6 +18,15 @@ func NewOrderHandler(s *service.OrderService) *OrderHandler {
 	return &OrderHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách order
+// @Description Lấy danh sách đơn hàng
+// @Tags order
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.Order}
+// @Router /orders [get]
 func (h *OrderHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -40,6 +49,15 @@ func (h *OrderHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết order
+// @Description Lấy chi tiết một đơn hàng theo ID
+// @Tags order
+// @Produce json
+// @Param id path int true "ID order"
+// @Success 200 {object} model.Order
+// @Failure 404 {object} response.ErrorResponse
+// @Router /orders/{id} [get]
 func (h *OrderHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -55,6 +73,16 @@ func (h *OrderHandler) GetByID(c *gin.Context) {
 	response.Success(c, order, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới order
+// @Description Tạo mới một đơn hàng
+// @Tags order
+// @Accept json
+// @Produce json
+// @Param order body model.Order true "Dữ liệu order" example({"customer_id":1,"table_id":2,"amount":500000,"status":"UnPaid"})
+// @Success 200 {object} model.Order
+// @Failure 400 {object} response.ErrorResponse
+// @Router /orders [post]
 func (h *OrderHandler) Create(c *gin.Context) {
 	var order model.Order
 	if err := c.ShouldBindJSON(&order); err != nil {
@@ -68,6 +96,17 @@ func (h *OrderHandler) Create(c *gin.Context) {
 	response.Success(c, order, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật order
+// @Description Cập nhật thông tin đơn hàng
+// @Tags order
+// @Accept json
+// @Produce json
+// @Param id path int true "ID order"
+// @Param updates body object true "Dữ liệu cập nhật" example({"status":"Paid"})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /orders/{id} [patch]
 func (h *OrderHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -87,6 +126,15 @@ func (h *OrderHandler) Update(c *gin.Context) {
 	response.Success(c, "Order updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa order
+// @Description Xóa một đơn hàng
+// @Tags order
+// @Produce json
+// @Param id path int true "ID order"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /orders/{id} [delete]
 func (h *OrderHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

@@ -18,6 +18,15 @@ func NewOrderItemHandler(s *service.OrderItemService) *OrderItemHandler {
 	return &OrderItemHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách order item
+// @Description Lấy danh sách các món trong đơn hàng
+// @Tags orderitem
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.OrderItem}
+// @Router /order-items [get]
 func (h *OrderItemHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -40,6 +49,15 @@ func (h *OrderItemHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết order item
+// @Description Lấy chi tiết một món trong đơn hàng theo ID
+// @Tags orderitem
+// @Produce json
+// @Param id path int true "ID order item"
+// @Success 200 {object} model.OrderItem
+// @Failure 404 {object} response.ErrorResponse
+// @Router /order-items/{id} [get]
 func (h *OrderItemHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -55,6 +73,16 @@ func (h *OrderItemHandler) GetByID(c *gin.Context) {
 	response.Success(c, orderItem, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới order item
+// @Description Thêm món vào đơn hàng
+// @Tags orderitem
+// @Accept json
+// @Produce json
+// @Param orderItem body model.OrderItem true "Dữ liệu order item" example({"order_id":1,"menu_item_id":2,"quantity":3,"amount":360000})
+// @Success 200 {object} model.OrderItem
+// @Failure 400 {object} response.ErrorResponse
+// @Router /order-items [post]
 func (h *OrderItemHandler) Create(c *gin.Context) {
 	var orderItem model.OrderItem
 	if err := c.ShouldBindJSON(&orderItem); err != nil {
@@ -68,6 +96,17 @@ func (h *OrderItemHandler) Create(c *gin.Context) {
 	response.Success(c, orderItem, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật order item
+// @Description Cập nhật thông tin món trong đơn hàng
+// @Tags orderitem
+// @Accept json
+// @Produce json
+// @Param id path int true "ID order item"
+// @Param updates body object true "Dữ liệu cập nhật" example({"quantity":5})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /order-items/{id} [patch]
 func (h *OrderItemHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -87,6 +126,15 @@ func (h *OrderItemHandler) Update(c *gin.Context) {
 	response.Success(c, "OrderItem updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa order item
+// @Description Xóa một món khỏi đơn hàng
+// @Tags orderitem
+// @Produce json
+// @Param id path int true "ID order item"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /order-items/{id} [delete]
 func (h *OrderItemHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

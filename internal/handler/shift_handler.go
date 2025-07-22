@@ -21,6 +21,15 @@ func NewShiftHandler(s *service.ShiftService) *ShiftHandler {
 	return &ShiftHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách ca làm việc
+// @Description Lấy danh sách ca làm việc
+// @Tags shift
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.Shift}
+// @Router /shifts [get]
 func (h *ShiftHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -44,6 +53,15 @@ func (h *ShiftHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết ca làm việc
+// @Description Lấy chi tiết một ca làm việc theo ID
+// @Tags shift
+// @Produce json
+// @Param id path int true "ID shift"
+// @Success 200 {object} model.Shift
+// @Failure 404 {object} response.ErrorResponse
+// @Router /shifts/{id} [get]
 func (h *ShiftHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -61,6 +79,16 @@ func (h *ShiftHandler) GetByID(c *gin.Context) {
 	response.Success(c, shift, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới ca làm việc
+// @Description Tạo mới một ca làm việc
+// @Tags shift
+// @Accept json
+// @Produce json
+// @Param shift body model.Shift true "Dữ liệu ca làm việc" example({"shift_name":"Ca sáng","code":"MORNING","start_time":"08:00","end_time":"12:00"})
+// @Success 200 {object} model.Shift
+// @Failure 400 {object} response.ErrorResponse
+// @Router /shifts [post]
 func (h *ShiftHandler) Create(c *gin.Context) {
 	var shift model.Shift
 	if err := c.ShouldBindJSON(&shift); err != nil {
@@ -76,6 +104,17 @@ func (h *ShiftHandler) Create(c *gin.Context) {
 	response.Success(c, shift, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật ca làm việc
+// @Description Cập nhật thông tin ca làm việc
+// @Tags shift
+// @Accept json
+// @Produce json
+// @Param id path int true "ID shift"
+// @Param updates body object true "Dữ liệu cập nhật" example({"shift_name":"Ca chiều"})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /shifts/{id} [patch]
 func (h *ShiftHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -98,6 +137,15 @@ func (h *ShiftHandler) Update(c *gin.Context) {
 	response.Success(c, "Shift updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa ca làm việc
+// @Description Xóa một ca làm việc
+// @Tags shift
+// @Produce json
+// @Param id path int true "ID shift"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /shifts/{id} [delete]
 func (h *ShiftHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

@@ -18,6 +18,15 @@ func NewAttendanceHandler(s *service.AttendanceService) *AttendanceHandler {
 	return &AttendanceHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách chấm công
+// @Description Lấy danh sách chấm công
+// @Tags attendance
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.Attendance}
+// @Router /attendances [get]
 func (h *AttendanceHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -40,6 +49,15 @@ func (h *AttendanceHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết chấm công
+// @Description Lấy chi tiết một bản ghi chấm công theo ID
+// @Tags attendance
+// @Produce json
+// @Param id path int true "ID chấm công"
+// @Success 200 {object} model.Attendance
+// @Failure 404 {object} response.ErrorResponse
+// @Router /attendances/{id} [get]
 func (h *AttendanceHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -55,6 +73,16 @@ func (h *AttendanceHandler) GetByID(c *gin.Context) {
 	response.Success(c, attendance, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới chấm công
+// @Description Tạo mới một bản ghi chấm công
+// @Tags attendance
+// @Accept json
+// @Produce json
+// @Param attendance body model.Attendance true "Dữ liệu chấm công" example({"shift_schedule_id":1,"actual_start_time":"2024-07-22T08:00:00Z","actual_end_time":"2024-07-22T17:00:00Z","hours":8})
+// @Success 200 {object} model.Attendance
+// @Failure 400 {object} response.ErrorResponse
+// @Router /attendances [post]
 func (h *AttendanceHandler) Create(c *gin.Context) {
 	var attendance model.Attendance
 	if err := c.ShouldBindJSON(&attendance); err != nil {
@@ -68,6 +96,17 @@ func (h *AttendanceHandler) Create(c *gin.Context) {
 	response.Success(c, attendance, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật chấm công
+// @Description Cập nhật thông tin một bản ghi chấm công
+// @Tags attendance
+// @Accept json
+// @Produce json
+// @Param id path int true "ID chấm công"
+// @Param updates body object true "Dữ liệu cập nhật" example({"hours":9})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /attendances/{id} [patch]
 func (h *AttendanceHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -87,6 +126,15 @@ func (h *AttendanceHandler) Update(c *gin.Context) {
 	response.Success(c, "Attendance updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa chấm công
+// @Description Xóa một bản ghi chấm công
+// @Tags attendance
+// @Produce json
+// @Param id path int true "ID chấm công"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /attendances/{id} [delete]
 func (h *AttendanceHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

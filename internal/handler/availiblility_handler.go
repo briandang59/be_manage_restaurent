@@ -21,6 +21,15 @@ func NewAvailibilityHandler(s *service.AvailibilityService) *AvailibilityHandler
 	return &AvailibilityHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách availibility
+// @Description Lấy danh sách availibility
+// @Tags availibility
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.Availibility}
+// @Router /availibilities [get]
 func (h *AvailibilityHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -59,6 +68,15 @@ func (h *AvailibilityHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết availibility
+// @Description Lấy chi tiết một availibility theo ID
+// @Tags availibility
+// @Produce json
+// @Param id path int true "ID availibility"
+// @Success 200 {object} model.Availibility
+// @Failure 404 {object} response.ErrorResponse
+// @Router /availibilities/{id} [get]
 func (h *AvailibilityHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -76,6 +94,16 @@ func (h *AvailibilityHandler) GetByID(c *gin.Context) {
 	response.Success(c, availibility, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới availibility
+// @Description Tạo mới một availibility
+// @Tags availibility
+// @Accept json
+// @Produce json
+// @Param availibility body model.Availibility true "Dữ liệu availibility" example({"employee_id":1,"shift_id":2,"date":"2024-07-22"})
+// @Success 200 {object} model.Availibility
+// @Failure 400 {object} response.ErrorResponse
+// @Router /availibilities [post]
 func (h *AvailibilityHandler) Create(c *gin.Context) {
 	var availabilities []model.Availibility
 	if err := c.ShouldBindJSON(&availabilities); err != nil {
@@ -95,6 +123,17 @@ func (h *AvailibilityHandler) Create(c *gin.Context) {
 	response.Success(c, availabilities, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật availibility
+// @Description Cập nhật thông tin availibility
+// @Tags availibility
+// @Accept json
+// @Produce json
+// @Param id path int true "ID availibility"
+// @Param updates body object true "Dữ liệu cập nhật" example({"date":"2024-07-23"})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /availibilities/{id} [patch]
 func (h *AvailibilityHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -114,6 +153,15 @@ func (h *AvailibilityHandler) Update(c *gin.Context) {
 	response.Success(c, "Availibility updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa availibility
+// @Description Xóa một availibility
+// @Tags availibility
+// @Produce json
+// @Param id path int true "ID availibility"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /availibilities/{id} [delete]
 func (h *AvailibilityHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

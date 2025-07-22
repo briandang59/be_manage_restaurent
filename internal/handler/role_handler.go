@@ -18,6 +18,15 @@ func NewRoleHandler(s *service.RoleService) *RoleHandler {
 	return &RoleHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách role
+// @Description Lấy danh sách quyền
+// @Tags role
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.Role}
+// @Router /roles [get]
 func (h *RoleHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -40,6 +49,15 @@ func (h *RoleHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết role
+// @Description Lấy chi tiết một quyền theo ID
+// @Tags role
+// @Produce json
+// @Param id path int true "ID role"
+// @Success 200 {object} model.Role
+// @Failure 404 {object} response.ErrorResponse
+// @Router /roles/{id} [get]
 func (h *RoleHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -55,6 +73,16 @@ func (h *RoleHandler) GetByID(c *gin.Context) {
 	response.Success(c, role, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới role
+// @Description Tạo mới một quyền
+// @Tags role
+// @Accept json
+// @Produce json
+// @Param role body model.Role true "Dữ liệu role" example({"role_name":"admin"})
+// @Success 200 {object} model.Role
+// @Failure 400 {object} response.ErrorResponse
+// @Router /roles [post]
 func (h *RoleHandler) Create(c *gin.Context) {
 	var role model.Role
 	if err := c.ShouldBindJSON(&role); err != nil {
@@ -68,6 +96,17 @@ func (h *RoleHandler) Create(c *gin.Context) {
 	response.Success(c, role, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật role
+// @Description Cập nhật thông tin một quyền
+// @Tags role
+// @Accept json
+// @Produce json
+// @Param id path int true "ID role"
+// @Param updates body object true "Dữ liệu cập nhật" example({"role_name":"manager"})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /roles/{id} [patch]
 func (h *RoleHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -87,6 +126,15 @@ func (h *RoleHandler) Update(c *gin.Context) {
 	response.Success(c, "Role updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa role
+// @Description Xóa một quyền
+// @Tags role
+// @Produce json
+// @Param id path int true "ID role"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /roles/{id} [delete]
 func (h *RoleHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

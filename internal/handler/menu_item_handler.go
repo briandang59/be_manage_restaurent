@@ -18,6 +18,15 @@ func NewMenuItemHandler(s *service.MenuItemService) *MenuItemHandler {
 	return &MenuItemHandler{svc: s}
 }
 
+// GetAll godoc
+// @Summary Lấy danh sách menu item
+// @Description Lấy danh sách các món ăn trong thực đơn
+// @Tags menuitem
+// @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.MenuItem}
+// @Router /menu-items [get]
 func (h *MenuItemHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
@@ -40,6 +49,15 @@ func (h *MenuItemHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetByID godoc
+// @Summary Lấy chi tiết menu item
+// @Description Lấy chi tiết một món ăn theo ID
+// @Tags menuitem
+// @Produce json
+// @Param id path int true "ID menu item"
+// @Success 200 {object} model.MenuItem
+// @Failure 404 {object} response.ErrorResponse
+// @Router /menu-items/{id} [get]
 func (h *MenuItemHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -55,6 +73,16 @@ func (h *MenuItemHandler) GetByID(c *gin.Context) {
 	response.Success(c, menuItem, nil)
 }
 
+// Create godoc
+// @Summary Tạo mới menu item
+// @Description Tạo mới một món ăn trong thực đơn
+// @Tags menuitem
+// @Accept json
+// @Produce json
+// @Param menuItem body model.MenuItem true "Dữ liệu menu item" example({"name":"Pizza Margherita","description":"Pizza truyền thống Ý","price":120000,"file_id":1,"status":"Available"})
+// @Success 200 {object} model.MenuItem
+// @Failure 400 {object} response.ErrorResponse
+// @Router /menu-items [post]
 func (h *MenuItemHandler) Create(c *gin.Context) {
 	var menuItem model.MenuItem
 	if err := c.ShouldBindJSON(&menuItem); err != nil {
@@ -68,6 +96,17 @@ func (h *MenuItemHandler) Create(c *gin.Context) {
 	response.Success(c, menuItem, nil)
 }
 
+// Update godoc
+// @Summary Cập nhật menu item
+// @Description Cập nhật thông tin một món ăn
+// @Tags menuitem
+// @Accept json
+// @Produce json
+// @Param id path int true "ID menu item"
+// @Param updates body object true "Dữ liệu cập nhật" example({"name":"Pizza Hải sản","price":150000})
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /menu-items/{id} [patch]
 func (h *MenuItemHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -87,6 +126,15 @@ func (h *MenuItemHandler) Update(c *gin.Context) {
 	response.Success(c, "MenuItem updated successfully", nil)
 }
 
+// Delete godoc
+// @Summary Xóa menu item
+// @Description Xóa một món ăn khỏi thực đơn
+// @Tags menuitem
+// @Produce json
+// @Param id path int true "ID menu item"
+// @Success 200 {object} response.Body
+// @Failure 400 {object} response.ErrorResponse
+// @Router /menu-items/{id} [delete]
 func (h *MenuItemHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
