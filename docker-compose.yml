@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
     ports:
       - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
@@ -40,3 +42,6 @@ services:
       - "5678:5678"
     volumes:
       - ~/.n8n:/home/node/.n8n
+
+volumes:
+  db_data:

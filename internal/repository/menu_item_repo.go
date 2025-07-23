@@ -17,6 +17,10 @@ func (r *MenuItemRepo) Create(menuItem *model.MenuItem) error {
 	return r.db.Create(menuItem).Error
 }
 
+func (r *MenuItemRepo) BulkCreate(menuItems []model.MenuItem) error {
+	return r.db.Create(&menuItems).Error
+}
+
 func (r *MenuItemRepo) GetByID(id uint) (*model.MenuItem, error) {
 	var menuItem model.MenuItem
 	if err := r.db.First(&menuItem, id).Error; err != nil {

@@ -22,6 +22,7 @@ func (r *AccountRepo) GetByID(id uint) (*model.Account, error) {
 	if err := r.db.First(&account, id).Error; err != nil {
 		return nil, err
 	}
+	
 	return &account, nil
 }
 
@@ -41,11 +42,15 @@ func (r *AccountRepo) Delete(id uint) error {
 	return r.db.Delete(&model.Account{}, id).Error
 }
 
-func (r *AccountRepo) List(offset, limit int) ([]model.Account, int64, error) {
+func (r *AccountRepo) List(offset, limit int, preloadFields []string) ([]model.Account, int64, error) {
 	var accounts []model.Account
 	var total int64
-	r.db.Model(&model.Account{}).Count(&total)
-	if err := r.db.Offset(offset).Limit(limit).Find(&accounts).Error; err != nil {
+	db := r.db.Model(&model.Account{})
+	for _, field := range preloadFields {
+		db = db.Preload(field)
+	}
+	db.Count(&total)
+	if err := db.Offset(offset).Limit(limit).Find(&accounts).Error; err != nil {
 		return nil, 0, err
 	}
 	return accounts, total, nil

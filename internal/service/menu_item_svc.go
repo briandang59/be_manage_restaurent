@@ -31,4 +31,8 @@ func (s *MenuItemService) Delete(id uint) error {
 
 func (s *MenuItemService) List(offset, limit int) ([]model.MenuItem, int64, error) {
 	return s.repo.List(offset, limit)
+}
+
+func (s *MenuItemService) BulkCreate(menuItems []model.MenuItem) error {
+	return s.repo.BulkCreate(menuItems)
 } 

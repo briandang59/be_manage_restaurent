@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"manage_restaurent/internal/dto"
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/service"
@@ -8,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"manage_restaurent/utils"
 )
 
 type AccountHandler struct {
@@ -37,12 +39,24 @@ func (h *AccountHandler) GetAll(c *gin.Context) {
 		pageSize = 10
 	}
 	offset := (page - 1) * pageSize
-	list, total, err := h.svc.List(offset, pageSize)
+	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
+	list, total, err := h.svc.List(offset, pageSize, preloadFields)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	response.Success(c, list, &response.Pagination{
+	var dtoList []dto.AccountDTO
+	for _, acc := range list {
+		dtoList = append(dtoList, dto.AccountDTO{
+			ID: acc.ID,
+			UserName: acc.UserName,
+			RoleId: acc.RoleId,
+			Role: acc.Role,
+			CreatedAt: acc.CreatedAt,
+			UpdatedAt: acc.UpdatedAt,
+		})
+	}
+	response.Success(c, dtoList, &response.Pagination{
 		Page:     page,
 		PageSize: pageSize,
 		Total:    int(total),
@@ -70,7 +84,15 @@ func (h *AccountHandler) GetByID(c *gin.Context) {
 		response.Error(c, http.StatusNotFound, "Account not found")
 		return
 	}
-	response.Success(c, account, nil)
+	accDTO := dto.AccountDTO{
+		ID: account.ID,
+		UserName: account.UserName,
+		RoleId: account.RoleId,
+		Role: account.Role,
+		CreatedAt: account.CreatedAt,
+		UpdatedAt: account.UpdatedAt,
+	}
+	response.Success(c, accDTO, nil)
 }
 
 // Create godoc

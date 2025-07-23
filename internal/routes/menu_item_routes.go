@@ -12,4 +12,5 @@ func MenuItemRoutes(rg *gin.RouterGroup, h *handler.MenuItemHandler) {
 	rg.POST("/menu-items", h.Create)
 	rg.PATCH("/menu-items/:id", h.Update)
 	rg.DELETE("/menu-items/:id", h.Delete)
+	rg.POST("/menu-items/import-excel", h.ImportExcel)
 } 

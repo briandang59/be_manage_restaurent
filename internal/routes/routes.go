@@ -25,7 +25,8 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	accountRepo := repository.NewAccountRepo(db)
 	accountService := service.NewAccountService(accountRepo)
 	accountHandler := handler.NewAccountHandler(accountService)
-	AccountRoutes(noAuth, accountHandler)
+	AccountPublicRoutes(noAuth, accountHandler)
+	AccountProtectedRoutes(api, accountHandler)
 
 	// Dependencies for Customer
 	customerRepo := repository.NewCustomerRepo(db)

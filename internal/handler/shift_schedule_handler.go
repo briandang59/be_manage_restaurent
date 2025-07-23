@@ -39,9 +39,21 @@ func (h *ShiftScheduleHandler) GetAll(c *gin.Context) {
 	if pageSize < 1 {
 		pageSize = 10
 	}
+
+	filters := make(map[string]interface{})
+
+	if employeeId := c.Query("employee_id"); employeeId != "" {
+		employeeIdInt, _ := strconv.Atoi(employeeId)
+		filters["employee_id"] = employeeIdInt
+	}
+	if shiftId := c.Query("shift_id"); shiftId != "" {
+		shiftIdInt, _ := strconv.Atoi(shiftId)
+		filters["shift_id"] = shiftIdInt
+	}
+
 	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
 
-	list, total, err := h.svc.GetAll(page, pageSize, preloadFields)
+	list, total, err := h.svc.GetAll(page, pageSize, preloadFields, filters)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return

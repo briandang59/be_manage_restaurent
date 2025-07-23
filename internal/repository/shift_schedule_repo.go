@@ -8,7 +8,7 @@ import (
 
 // ShiftScheduleRepo định nghĩa các phương thức tương tác với bảng ShiftSchedule
 type ShiftScheduleRepo interface {
-	FindAll(page, pageSize int, preloadFields []string) ([]model.ShiftSchedule, int64, error)
+	FindAll(page, pageSize int, preloadFields []string, filters map[string]interface{}) ([]model.ShiftSchedule, int64, error)
 	FindByID(id uint) (*model.ShiftSchedule, error)
 	Create(shiftSchedule *model.ShiftSchedule) error
 	BulkCreate(shiftSchedules []model.ShiftSchedule) error
@@ -25,7 +25,7 @@ func NewShiftScheduleRepo(db *gorm.DB) ShiftScheduleRepo {
 	return &shiftScheduleRepo{db: db}
 }
 
-func (r *shiftScheduleRepo) FindAll(page, pageSize int, preloadFields []string) ([]model.ShiftSchedule, int64, error) {
+func (r *shiftScheduleRepo) FindAll(page, pageSize int, preloadFields []string, filters map[string]interface{}) ([]model.ShiftSchedule, int64, error) {
 	var list []model.ShiftSchedule
 	var total int64
 	offset := (page - 1) * pageSize
@@ -35,6 +35,12 @@ func (r *shiftScheduleRepo) FindAll(page, pageSize int, preloadFields []string) 
 		query = query.Preload(field)
 	}
 
+	if shiftId, ok := filters["shift_id"]; ok {
+		query = query.Where("shift_id = ?", shiftId)
+	}
+	if employeeId, ok := filters["employee_id"]; ok {
+		query = query.Where("employee_id = ?", employeeId)
+	}
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}

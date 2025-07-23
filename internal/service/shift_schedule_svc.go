@@ -15,8 +15,8 @@ func NewShiftScheduleService(r repository.ShiftScheduleRepo) *ShiftScheduleServi
 	return &ShiftScheduleService{repo: r}
 }
 
-func (s *ShiftScheduleService) GetAll(page, pageSize int, preloadFields []string) ([]model.ShiftSchedule, int64, error) {
-	return s.repo.FindAll(page, pageSize, preloadFields)
+func (s *ShiftScheduleService) GetAll(page, pageSize int, preloadFields []string, filters map[string]interface{}) ([]model.ShiftSchedule, int64, error) {
+	return s.repo.FindAll(page, pageSize, preloadFields, filters)
 }
 
 func (s *ShiftScheduleService) GetByID(id uint) (*model.ShiftSchedule, error) {

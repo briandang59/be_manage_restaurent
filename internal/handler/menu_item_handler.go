@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xuri/excelize/v2"
 )
 
 type MenuItemHandler struct {
@@ -147,4 +148,53 @@ func (h *MenuItemHandler) Delete(c *gin.Context) {
 		return
 	}
 	response.Success(c, "MenuItem deleted successfully", nil)
+}
+
+func (h *MenuItemHandler) ImportExcel(c *gin.Context) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Không có file upload")
+		return
+	}
+	f, err := file.Open()
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Không mở được file")
+		return
+	}
+	defer f.Close()
+
+	excel, err := excelize.OpenReader(f)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "File không phải excel hợp lệ")
+		return
+	}
+
+	rows, err := excel.GetRows("Sheet1") // Đổi tên sheet nếu cần
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Không đọc được sheet")
+		return
+	}
+
+	var items []model.MenuItem
+	for i, row := range rows {
+		if i == 0 { continue } // Bỏ qua header
+		if len(row) < 3 { continue }
+		price, err := strconv.Atoi(row[2])
+		if err != nil {
+			response.Error(c, http.StatusBadRequest, "Giá không hợp lệ ở dòng "+strconv.Itoa(i+1))
+			return
+		}
+		item := model.MenuItem{
+			Name:        row[0],
+			Description: row[1],
+			Price:       int64(price * 1000),
+		}
+		items = append(items, item)
+	}
+
+	if err := h.svc.BulkCreate(items); err != nil {
+		response.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	response.Success(c, items, nil)
 } 

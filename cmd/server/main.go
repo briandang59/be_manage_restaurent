@@ -52,6 +52,16 @@ func main() {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}
 
+	// Seed roles và permissions chỉ khi lần đầu (nếu chưa có dữ liệu)
+	var roleCount int64
+	var permCount int64
+	db.Model(&model.Role{}).Count(&roleCount)
+	db.Model(&model.Permission{}).Count(&permCount)
+	if roleCount == 0 || permCount == 0 {
+		model.SeedRolesAndPermissions(db)
+		log.Println("✅ Đã seed roles và permissions mẫu!")
+	}
+
 	// Tạo router
 	r := gin.Default()
 

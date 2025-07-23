@@ -52,8 +52,8 @@ func (s *AccountService) Delete(id uint) error {
 	return s.repo.Delete(id)
 }
 
-func (s *AccountService) List(offset, limit int) ([]model.Account, int64, error) {
-	return s.repo.List(offset, limit)
+func (s *AccountService) List(offset, limit int, preloadFields []string) ([]model.Account, int64, error) {
+	return s.repo.List(offset, limit, preloadFields)
 }
 
 func (s *AccountService) Login(username, password string) (string, error) {
