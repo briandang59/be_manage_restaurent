@@ -8,12 +8,14 @@ import (
 	"github.com/joho/godotenv"
 
 	"manage_restaurent/config"
+	"manage_restaurent/internal/middlewares"
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/routes"
 
 	docs "manage_restaurent/docs"
+
+	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/files"
 )
 
 // @title Restaurant Management API
@@ -64,7 +66,7 @@ func main() {
 
 	// Tạo router
 	r := gin.Default()
-
+	r.Use(middlewares.CORSMiddleware())
 	// Swagger endpoint
 	docs.SwaggerInfo.BasePath = "/api"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
