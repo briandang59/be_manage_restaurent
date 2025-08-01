@@ -2,6 +2,7 @@ package repository
 
 import (
 	"manage_restaurent/internal/model"
+
 	"gorm.io/gorm"
 )
 
@@ -36,9 +37,13 @@ func (r *PermissionRepo) Delete(id uint) error {
 func (r *PermissionRepo) List(offset, limit int) ([]model.Permission, int64, error) {
 	var permissions []model.Permission
 	var total int64
-	r.db.Model(&model.Permission{}).Count(&total)
+
+	if err := r.db.Model(&model.Permission{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
 	if err := r.db.Preload("Roles").Offset(offset).Limit(limit).Find(&permissions).Error; err != nil {
 		return nil, 0, err
 	}
 	return permissions, total, nil
-} 
+}
