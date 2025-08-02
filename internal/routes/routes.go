@@ -65,7 +65,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 
 	fileRepo := repository.NewFileRepo(db)
 	fileHandler := handler.NewFileHandler(fileRepo)
-	api.POST("/files/upload", fileHandler.UploadFile)
+	FileRoutes(api, fileHandler)
 
 	// Dependencies for Role
 	roleRepo := repository.NewRoleRepo(db)

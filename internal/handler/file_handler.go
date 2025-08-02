@@ -8,6 +8,7 @@ import (
 	"manage_restaurent/internal/repository"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
@@ -106,4 +107,33 @@ func (h *FileHandler) GetFile(c *gin.Context) {
 func (h *FileHandler) DeleteFile(c *gin.Context) {
 	// ... code xóa file ...
 	response.Success(c, "File deleted", nil)
+}
+
+// ListFiles godoc
+// @Summary Lấy danh sách file
+// @Description Lấy danh sách file đã upload
+// @Tags file
+// @Produce json
+// @Success 200 {object} []model.File
+// @Router /files [get]
+func (h *FileHandler) ListFiles(c *gin.Context) {
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 10
+	}
+	offset := (page - 1) * pageSize
+	files, total, err := h.repo.List(offset, pageSize)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "Không lấy được danh sách file")
+		return
+	}
+	response.Success(c, files, &response.Pagination{
+		Page:     page,
+		PageSize: pageSize,
+		Total:    int(total),
+	})
 } 
