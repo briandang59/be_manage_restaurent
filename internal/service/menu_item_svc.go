@@ -29,8 +29,8 @@ func (s *MenuItemService) Delete(id uint) error {
 	return s.repo.Delete(id)
 }
 
-func (s *MenuItemService) List(offset, limit int) ([]model.MenuItem, int64, error) {
-	return s.repo.List(offset, limit)
+func (s *MenuItemService) List(offset, limit int, preloadFields []string) ([]model.MenuItem, int64, error) {
+	return s.repo.List(offset, limit, preloadFields)
 }
 
 func (s *MenuItemService) BulkCreate(menuItems []model.MenuItem) error {

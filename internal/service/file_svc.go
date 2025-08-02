@@ -25,6 +25,6 @@ func (s *FileService) Delete(id uint) error {
 	return s.repo.Delete(id)
 }
 
-func (s *FileService) List(offset, limit int) ([]model.File, int64, error) {
-	return s.repo.List(offset, limit)
+func (s *FileService) List(offset, limit int, preloadFields []string) ([]model.File, int64, error) {
+	return s.repo.List(offset, limit, preloadFields)
 } 

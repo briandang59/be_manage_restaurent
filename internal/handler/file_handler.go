@@ -6,6 +6,7 @@ import (
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/repository"
+	"manage_restaurent/utils"
 	"net/http"
 	"os"
 	"strconv"
@@ -178,6 +179,9 @@ func (h *FileHandler) DeleteFile(c *gin.Context) {
 // @Description Lấy danh sách file đã upload
 // @Tags file
 // @Produce json
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Param populate query string false "Preload fields (e.g. populate=File)"
 // @Success 200 {object} []model.File
 // @Router /files [get]
 func (h *FileHandler) ListFiles(c *gin.Context) {
@@ -190,7 +194,10 @@ func (h *FileHandler) ListFiles(c *gin.Context) {
 		pageSize = 10
 	}
 	offset := (page - 1) * pageSize
-	files, total, err := h.repo.List(offset, pageSize)
+	
+	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
+	
+	files, total, err := h.repo.List(offset, pageSize, preloadFields)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "Không lấy được danh sách file")
 		return

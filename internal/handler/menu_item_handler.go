@@ -4,6 +4,7 @@ import (
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/service"
+	"manage_restaurent/utils"
 	"net/http"
 	"strconv"
 
@@ -26,6 +27,7 @@ func NewMenuItemHandler(s *service.MenuItemService) *MenuItemHandler {
 // @Produce json
 // @Param page query int false "Trang"
 // @Param page_size query int false "Số lượng mỗi trang"
+// @Param populate query string false "Preload fields (e.g. populate=File)"
 // @Success 200 {object} response.Body{data=[]model.MenuItem}
 // @Router /menu-items [get]
 func (h *MenuItemHandler) GetAll(c *gin.Context) {
@@ -38,7 +40,10 @@ func (h *MenuItemHandler) GetAll(c *gin.Context) {
 		pageSize = 10
 	}
 	offset := (page - 1) * pageSize
-	list, total, err := h.svc.List(offset, pageSize)
+	
+	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
+	
+	list, total, err := h.svc.List(offset, pageSize, preloadFields)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return

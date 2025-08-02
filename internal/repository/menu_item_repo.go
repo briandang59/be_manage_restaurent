@@ -37,11 +37,20 @@ func (r *MenuItemRepo) Delete(id uint) error {
 	return r.db.Delete(&model.MenuItem{}, id).Error
 }
 
-func (r *MenuItemRepo) List(offset, limit int) ([]model.MenuItem, int64, error) {
+func (r *MenuItemRepo) List(offset, limit int, preloadFields []string) ([]model.MenuItem, int64, error) {
 	var menuItems []model.MenuItem
 	var total int64
-	r.db.Model(&model.MenuItem{}).Count(&total)
-	if err := r.db.Offset(offset).Limit(limit).Find(&menuItems).Error; err != nil {
+	
+	query := r.db.Model(&model.MenuItem{})
+	for _, field := range preloadFields {
+		query = query.Preload(field)
+	}
+	
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	
+	if err := query.Offset(offset).Limit(limit).Find(&menuItems).Error; err != nil {
 		return nil, 0, err
 	}
 	return menuItems, total, nil
