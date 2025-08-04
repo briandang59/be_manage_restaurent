@@ -18,7 +18,7 @@ type Employee struct {
 	Address        string                    `json:"address"`
 	JoinDate       string                    `json:"join_date"`
 	BaseSalary     int64                     `json:"base_salary"`
-	SalaryPerHours int64                     `json:"salary_per_hour"`
+	SalaryPerHour  int64                     `json:"salary_per_hour"`
 	AccountID      *uint                     `json:"account_id"`
 	Account        *Account                  `json:"account,omitempty" gorm:"foreignKey:AccountID"`
 	AvatarFileID   *uint                     `json:"avatar_file_id"`

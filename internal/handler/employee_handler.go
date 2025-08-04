@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"manage_restaurent/internal/dto"
+	"manage_restaurent/internal/enum"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/service"
 	"manage_restaurent/utils"
@@ -83,7 +85,7 @@ func (h *EmployeeHandler) GetByID(c *gin.Context) {
 
 // Create godoc
 // @Summary Tạo mới nhân viên
-// @Description Tạo mới một nhân viên
+// @Description Tạo mới một nhân viên. Nếu có role_id thì tự động tạo account
 // @Tags employee
 // @Accept json
 // @Produce json
@@ -92,12 +94,156 @@ func (h *EmployeeHandler) GetByID(c *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse
 // @Router /employees [post]
 func (h *EmployeeHandler) Create(c *gin.Context) {
-	var employee model.Employee
-	if err := c.ShouldBindJSON(&employee); err != nil {
+	// Đọc request body một lần duy nhất
+	var requestBody map[string]interface{}
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := h.svc.Create(&employee); err != nil {
+
+	// Kiểm tra có role_id không
+	if _, exists := requestBody["role_id"]; exists {
+		// Có role_id -> tạo employee với account tự động
+		// Chuyển đổi requestBody thành CreateEmployeeDTO
+		createDTO := dto.CreateEmployeeDTO{
+			FullName:      getString(requestBody, "full_name"),
+			Gender:        getBool(requestBody, "gender"),
+			Birthday:      getString(requestBody, "birthday"),
+			PhoneNumber:   getString(requestBody, "phone_number"),
+			Email:         getString(requestBody, "email"),
+			ScheduleType:  getScheduleType(requestBody, "schedule_type"),
+			Address:       getString(requestBody, "address"),
+			JoinDate:      getString(requestBody, "join_date"),
+			BaseSalary:    getInt64(requestBody, "base_salary"),
+			SalaryPerHour: getInt64(requestBody, "salary_per_hour"),
+			AvatarFileID:  getUintPtr(requestBody, "avatar_file_id"),
+			RoleId:        getUint(requestBody, "role_id"),
+		}
+		
+		employee, err := h.svc.CreateWithAutoAccount(&createDTO)
+		if err != nil {
+			response.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+		response.Success(c, employee, nil)
+	} else {
+		// Không có role_id -> tạo employee thông thường
+		// Chuyển đổi requestBody thành Employee model
+		employee := model.Employee{
+			FullName:      getString(requestBody, "full_name"),
+			Gender:        getBool(requestBody, "gender"),
+			Birthday:      getString(requestBody, "birthday"),
+			PhoneNumber:   getString(requestBody, "phone_number"),
+			Email:         getString(requestBody, "email"),
+			ScheduleType:  getScheduleType(requestBody, "schedule_type"),
+			Address:       getString(requestBody, "address"),
+			JoinDate:      getString(requestBody, "join_date"),
+			BaseSalary:    getInt64(requestBody, "base_salary"),
+			SalaryPerHour: getInt64(requestBody, "salary_per_hour"),
+			AvatarFileID:  getUintPtr(requestBody, "avatar_file_id"),
+		}
+		
+		if err := h.svc.Create(&employee); err != nil {
+			response.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+		response.Success(c, employee, nil)
+	}
+}
+
+// Helper functions để chuyển đổi kiểu dữ liệu
+func getString(data map[string]interface{}, key string) string {
+	if val, exists := data[key]; exists {
+		if str, ok := val.(string); ok {
+			return str
+		}
+	}
+	return ""
+}
+
+func getBool(data map[string]interface{}, key string) bool {
+	if val, exists := data[key]; exists {
+		if b, ok := val.(bool); ok {
+			return b
+		}
+	}
+	return false
+}
+
+func getInt64(data map[string]interface{}, key string) int64 {
+	if val, exists := data[key]; exists {
+		switch v := val.(type) {
+		case float64:
+			return int64(v)
+		case int:
+			return int64(v)
+		case int64:
+			return v
+		}
+	}
+	return 0
+}
+
+func getUint(data map[string]interface{}, key string) uint {
+	if val, exists := data[key]; exists {
+		switch v := val.(type) {
+		case float64:
+			return uint(v)
+		case int:
+			return uint(v)
+		case uint:
+			return v
+		}
+	}
+	return 0
+}
+
+func getUintPtr(data map[string]interface{}, key string) *uint {
+	if val, exists := data[key]; exists && val != nil {
+		var u uint
+		switch v := val.(type) {
+		case float64:
+			u = uint(v)
+		case int:
+			u = uint(v)
+		case uint:
+			u = v
+		default:
+			return nil
+		}
+		return &u
+	}
+	return nil
+}
+
+func getScheduleType(data map[string]interface{}, key string) enum.EmployeeScheduleType {
+	if val, exists := data[key]; exists {
+		if str, ok := val.(string); ok {
+			return enum.EmployeeScheduleType(str)
+		}
+	}
+	return ""
+}
+
+// CreateWithAutoAccount godoc
+// @Summary Tạo mới nhân viên với account tự động
+// @Description Tạo mới một nhân viên và tự động tạo account với username theo định dạng yymmdd và password mặc định
+// @Tags employee
+// @Accept json
+// @Produce json
+// @Param employee body dto.CreateEmployeeDTO true "Dữ liệu nhân viên với role_id" example({"full_name":"Nguyễn Văn A","gender":true,"birthday":"1990-01-01","role_id":1})
+// @Success 200 {object} model.Employee
+// @Failure 400 {object} response.ErrorResponse
+// @Router /employees/with-account [post]
+func (h *EmployeeHandler) CreateWithAutoAccount(c *gin.Context) {
+	var createDTO dto.CreateEmployeeDTO
+	if err := c.ShouldBindJSON(&createDTO); err != nil {
+		response.Error(c, http.StatusBadRequest, err.Error())
+		return
+	}
+	
+	employee, err := h.svc.CreateWithAutoAccount(&createDTO)
+	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -106,12 +252,12 @@ func (h *EmployeeHandler) Create(c *gin.Context) {
 
 // Update godoc
 // @Summary Cập nhật nhân viên
-// @Description Cập nhật thông tin một nhân viên
+// @Description Cập nhật thông tin một nhân viên. Nếu có role_id thì cập nhật account
 // @Tags employee
 // @Accept json
 // @Produce json
 // @Param id path int true "ID nhân viên"
-// @Param updates body object true "Dữ liệu cập nhật" example({"full_name":"Nguyễn Văn B"})
+// @Param updates body object true "Dữ liệu cập nhật" example({"full_name":"Nguyễn Văn B","role_id":2})
 // @Success 200 {object} response.Body
 // @Failure 400 {object} response.ErrorResponse
 // @Router /employees/{id} [patch]
@@ -122,15 +268,28 @@ func (h *EmployeeHandler) Update(c *gin.Context) {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
 	}
-	var updates map[string]interface{}
-	if err := c.ShouldBindJSON(&updates); err != nil {
+	
+	var requestBody map[string]interface{}
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := h.svc.Update(uint(id), updates); err != nil {
-		response.Error(c, http.StatusInternalServerError, err.Error())
-		return
+
+	// Kiểm tra có role_id không
+	if _, exists := requestBody["role_id"]; exists {
+		// Có role_id -> cập nhật employee và account
+		if err := h.svc.UpdateWithAccount(uint(id), requestBody); err != nil {
+			response.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+	} else {
+		// Không có role_id -> cập nhật employee thông thường
+		if err := h.svc.Update(uint(id), requestBody); err != nil {
+			response.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
+	
 	response.Success(c, "Employee updated successfully", nil)
 }
 

@@ -46,17 +46,46 @@ func SeedRolesAndPermissions(db *gorm.DB) {
 	// Seed roles
 	roles := []Role{
 		{RoleName: "Admin"},
-		{RoleName: "Manager"},
-		{RoleName: "Cashier"},
-		{RoleName: "Waiter"},
-		{RoleName: "Chef"},
-		{RoleName: "KitchenStaff"},
-		{RoleName: "InventoryStaff"},
-		{RoleName: "Customer"},
+		{RoleName: "Quản lý"},
+		{RoleName: "Thu ngân"},
+		{RoleName: "Phục vụ"},
+		{RoleName: "Đầu bếp"},
+		{RoleName: "Nhân viên bếp"},
+		{RoleName: "Nhân viên kho"},
+		{RoleName: "Khách hàng"},
 	}
 	for _, r := range roles {
 		if err := db.FirstOrCreate(&r, Role{RoleName: r.RoleName}).Error; err != nil {
 			log.Println("Seed role error:", err)
 		}
+	}
+
+	// Seed admin account
+	SeedAdminAccount(db)
+}
+
+// SeedAdminAccount tạo tài khoản admin mặc định
+func SeedAdminAccount(db *gorm.DB) {
+	// Tìm role Admin
+	var adminRole Role
+	if err := db.Where("role_name = ?", "Admin").First(&adminRole).Error; err != nil {
+		log.Println("Admin role not found, skipping admin account creation")
+		return
+	}
+
+	// Tạo admin account nếu chưa tồn tại
+	adminAccount := Account{
+		UserName: "admin",
+		Password: "e10adc3949ba59abbe56e057f20f883e", // MD5 hash của "123456"
+		RoleId:   adminRole.ID,
+	}
+
+	if err := db.FirstOrCreate(&adminAccount, Account{UserName: "admin"}).Error; err != nil {
+		log.Println("Seed admin account error:", err)
+	} else {
+		log.Println("✅ Admin account created/verified successfully!")
+		log.Println("   Username: admin")
+		log.Println("   Password: 123456")
+		log.Println("   Role: Admin")
 	}
 } 

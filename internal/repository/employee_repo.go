@@ -13,6 +13,7 @@ type EmployeeRepo interface {
 	Create(employee *model.Employee) error
 	Update(id uint, updates map[string]interface{}) error
 	Delete(id uint) error
+	GetDB() *gorm.DB
 }
 
 type employeeRepo struct {
@@ -66,4 +67,8 @@ func (r *employeeRepo) Update(id uint, updates map[string]interface{}) error {
 
 func (r *employeeRepo) Delete(id uint) error {
 	return r.db.Delete(&model.Employee{}, id).Error
+}
+
+func (r *employeeRepo) GetDB() *gorm.DB {
+	return r.db
 }
