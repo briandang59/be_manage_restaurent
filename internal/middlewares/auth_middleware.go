@@ -2,13 +2,22 @@ package middlewares
 
 import (
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("your_secret_key") // Nên load từ biến môi trường thực tế
+// getJWTSecret lấy JWT secret từ biến môi trường
+func getJWTSecret() []byte {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		// Fallback secret nếu không có biến môi trường (chỉ dùng cho development)
+		secret = "your_secret_key_development_only"
+	}
+	return []byte(secret)
+}
 
 type Claims struct {
 	UserID uint `json:"user_id"`
@@ -25,7 +34,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret, nil
+			return getJWTSecret(), nil
 		})
 		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -10,7 +11,15 @@ import (
 	"manage_restaurent/internal/repository"
 )
 
-var jwtSecret = []byte("your_secret_key") // Nên load từ biến môi trường thực tế
+// getJWTSecret lấy JWT secret từ biến môi trường
+func getJWTSecret() []byte {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		// Fallback secret nếu không có biến môi trường (chỉ dùng cho development)
+		secret = "your_secret_key_development_only"
+	}
+	return []byte(secret)
+}
 
 type AccountService struct {
 	repo *repository.AccountRepo
@@ -70,7 +79,7 @@ func (s *AccountService) Login(username, password string) (string, error) {
 		"exp":    time.Now().Add(24 * time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtSecret)
+	tokenString, err := token.SignedString(getJWTSecret())
 	if err != nil {
 		return "", err
 	}
