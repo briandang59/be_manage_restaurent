@@ -2,6 +2,7 @@ package repository
 
 import (
 	"manage_restaurent/internal/model"
+
 	"gorm.io/gorm"
 )
 
@@ -11,6 +12,10 @@ type RoleRepo struct {
 
 func NewRoleRepo(db *gorm.DB) *RoleRepo {
 	return &RoleRepo{db: db}
+}
+
+func (r *RoleRepo) GetDB() *gorm.DB {
+	return r.db
 }
 
 func (r *RoleRepo) Create(role *model.Role) error {
@@ -41,4 +46,4 @@ func (r *RoleRepo) List(offset, limit int) ([]model.Role, int64, error) {
 		return nil, 0, err
 	}
 	return roles, total, nil
-} 
+}

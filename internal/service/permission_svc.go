@@ -22,6 +22,11 @@ func (s *PermissionService) GetByID(id uint) (*model.Permission, error) {
 }
 
 func (s *PermissionService) Update(id uint, updates map[string]interface{}) error {
+	// Convert permission_name to name in updates if it exists
+	if permissionName, ok := updates["permission_name"]; ok {
+		delete(updates, "permission_name")
+		updates["name"] = permissionName
+	}
 	return s.repo.Update(id, updates)
 }
 
@@ -31,4 +36,4 @@ func (s *PermissionService) Delete(id uint) error {
 
 func (s *PermissionService) List(offset, limit int) ([]model.Permission, int64, error) {
 	return s.repo.List(offset, limit)
-} 
+}

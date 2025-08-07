@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"manage_restaurent/internal/model"
+	"manage_restaurent/internal/dto"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/service"
 	"net/http"
@@ -75,21 +75,22 @@ func (h *RoleHandler) GetByID(c *gin.Context) {
 
 // Create godoc
 // @Summary Tạo mới role
-// @Description Tạo mới một quyền
+// @Description Tạo mới một quyền và gán permissions
 // @Tags role
 // @Accept json
 // @Produce json
-// @Param role body model.Role true "Dữ liệu role" example({"role_name":"admin"})
+// @Param role body dto.CreateRoleDTO true "Dữ liệu role" example({"role_name":"admin","permissions":[1,2,3]})
 // @Success 200 {object} model.Role
 // @Failure 400 {object} response.ErrorResponse
 // @Router /roles [post]
 func (h *RoleHandler) Create(c *gin.Context) {
-	var role model.Role
-	if err := c.ShouldBindJSON(&role); err != nil {
+	var roleDTO dto.CreateRoleDTO
+	if err := c.ShouldBindJSON(&roleDTO); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := h.svc.Create(&role); err != nil {
+	role, err := h.svc.Create(&roleDTO)
+	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -98,13 +99,13 @@ func (h *RoleHandler) Create(c *gin.Context) {
 
 // Update godoc
 // @Summary Cập nhật role
-// @Description Cập nhật thông tin một quyền
+// @Description Cập nhật thông tin một quyền và danh sách permissions
 // @Tags role
 // @Accept json
 // @Produce json
 // @Param id path int true "ID role"
-// @Param updates body object true "Dữ liệu cập nhật" example({"role_name":"manager"})
-// @Success 200 {object} response.Body
+// @Param updates body dto.UpdateRoleDTO true "Dữ liệu cập nhật" example({"role_name":"manager","permissions":[1,2,3]})
+// @Success 200 {object} model.Role
 // @Failure 400 {object} response.ErrorResponse
 // @Router /roles/{id} [patch]
 func (h *RoleHandler) Update(c *gin.Context) {
@@ -114,16 +115,20 @@ func (h *RoleHandler) Update(c *gin.Context) {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
 	}
-	var updates map[string]interface{}
-	if err := c.ShouldBindJSON(&updates); err != nil {
+
+	var updateDTO dto.UpdateRoleDTO
+	if err := c.ShouldBindJSON(&updateDTO); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := h.svc.Update(uint(id), updates); err != nil {
+
+	updatedRole, err := h.svc.Update(uint(id), &updateDTO)
+	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	response.Success(c, "Role updated successfully", nil)
+
+	response.Success(c, updatedRole, nil)
 }
 
 // Delete godoc
@@ -147,4 +152,4 @@ func (h *RoleHandler) Delete(c *gin.Context) {
 		return
 	}
 	response.Success(c, "Role deleted successfully", nil)
-} 
+}
