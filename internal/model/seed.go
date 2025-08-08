@@ -1,8 +1,10 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"log"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func SeedRolesAndPermissions(db *gorm.DB) {
@@ -74,9 +76,10 @@ func SeedAdminAccount(db *gorm.DB) {
 	}
 
 	// Tạo admin account nếu chưa tồn tại
+	hash, _ := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
 	adminAccount := Account{
 		UserName: "admin",
-		Password: "e10adc3949ba59abbe56e057f20f883e", // MD5 hash của "123456"
+		Password: string(hash), // bcrypt hash của "123456"
 		RoleId:   adminRole.ID,
 	}
 
@@ -88,4 +91,4 @@ func SeedAdminAccount(db *gorm.DB) {
 		log.Println("   Password: 123456")
 		log.Println("   Role: Admin")
 	}
-} 
+}

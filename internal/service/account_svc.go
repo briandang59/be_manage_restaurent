@@ -5,10 +5,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
+	"manage_restaurent/internal/dto"
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/repository"
+
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // getJWTSecret lấy JWT secret từ biến môi trường
@@ -65,23 +67,49 @@ func (s *AccountService) List(offset, limit int, preloadFields []string) ([]mode
 	return s.repo.List(offset, limit, preloadFields)
 }
 
-func (s *AccountService) Login(username, password string) (string, error) {
-	acc, err := s.repo.GetByUserName(username)
+func (s *AccountService) Login(username, password string) (*dto.LoginResponseDTO, error) {
+	acc, err := s.repo.GetByUserNameWithRole(username)
 	if err != nil {
-		return "", errors.New("invalid username or password")
+		return nil, errors.New("invalid username or password")
 	}
+
+	// Kiểm tra password với bcrypt
 	if err := bcrypt.CompareHashAndPassword([]byte(acc.Password), []byte(password)); err != nil {
-		return "", errors.New("invalid username or password")
+		return nil, errors.New("invalid username or password")
 	}
 	claims := jwt.MapClaims{
 		"user_id": acc.ID,
 		"role_id": acc.RoleId,
-		"exp":    time.Now().Add(24 * time.Hour).Unix(),
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
 	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(getJWTSecret())
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return tokenString, nil
-} 
+
+	// Create user info without password
+	userInfo := map[string]interface{}{
+		"id":         acc.ID,
+		"user_name":  acc.UserName,
+		"role_id":    acc.RoleId,
+		"created_at": acc.CreatedAt,
+		"updated_at": acc.UpdatedAt,
+	}
+
+	// Create role info
+	var roleInfo interface{}
+	if acc.Role != nil {
+		roleInfo = map[string]interface{}{
+			"id":        acc.Role.ID,
+			"role_name": acc.Role.RoleName,
+		}
+	}
+
+	return &dto.LoginResponseDTO{
+		Token: tokenString,
+		User:  userInfo,
+		Role:  roleInfo,
+	}, nil
+}

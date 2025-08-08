@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"manage_restaurent/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 type AccountHandler struct {
@@ -48,10 +49,10 @@ func (h *AccountHandler) GetAll(c *gin.Context) {
 	var dtoList []dto.AccountDTO
 	for _, acc := range list {
 		dtoList = append(dtoList, dto.AccountDTO{
-			ID: acc.ID,
-			UserName: acc.UserName,
-			RoleId: acc.RoleId,
-			Role: acc.Role,
+			ID:        acc.ID,
+			UserName:  acc.UserName,
+			RoleId:    acc.RoleId,
+			Role:      acc.Role,
 			CreatedAt: acc.CreatedAt,
 			UpdatedAt: acc.UpdatedAt,
 		})
@@ -85,10 +86,10 @@ func (h *AccountHandler) GetByID(c *gin.Context) {
 		return
 	}
 	accDTO := dto.AccountDTO{
-		ID: account.ID,
-		UserName: account.UserName,
-		RoleId: account.RoleId,
-		Role: account.Role,
+		ID:        account.ID,
+		UserName:  account.UserName,
+		RoleId:    account.RoleId,
+		Role:      account.Role,
 		CreatedAt: account.CreatedAt,
 		UpdatedAt: account.UpdatedAt,
 	}
@@ -173,27 +174,24 @@ func (h *AccountHandler) Delete(c *gin.Context) {
 
 // Login godoc
 // @Summary Đăng nhập
-// @Description Đăng nhập tài khoản, trả về JWT token
+// @Description Đăng nhập tài khoản, trả về JWT token và thông tin user, role
 // @Tags account
 // @Accept json
 // @Produce json
-// @Param login body object true "Thông tin đăng nhập" example({"user_name":"admin","password":"123456"})
-// @Success 200 {object} map[string]string
+// @Param login body dto.LoginRequestDTO true "Thông tin đăng nhập" example({"user_name":"admin","password":"123456"})
+// @Success 200 {object} dto.LoginResponseDTO
 // @Failure 401 {object} response.ErrorResponse
 // @Router /accounts/login [post]
 func (h *AccountHandler) Login(c *gin.Context) {
-	var req struct {
-		UserName string `json:"user_name"`
-		Password string `json:"password"`
-	}
+	var req dto.LoginRequestDTO
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	token, err := h.svc.Login(req.UserName, req.Password)
+	loginResponse, err := h.svc.Login(req.UserName, req.Password)
 	if err != nil {
 		response.Error(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-	response.Success(c, gin.H{"token": token}, nil)
-} 
+	response.Success(c, loginResponse, nil)
+}

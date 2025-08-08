@@ -1,8 +1,9 @@
 package repository
 
 import (
-	"gorm.io/gorm"
 	"manage_restaurent/internal/model"
+
+	"gorm.io/gorm"
 )
 
 type AccountRepo struct {
@@ -22,13 +23,21 @@ func (r *AccountRepo) GetByID(id uint) (*model.Account, error) {
 	if err := r.db.First(&account, id).Error; err != nil {
 		return nil, err
 	}
-	
+
 	return &account, nil
 }
 
 func (r *AccountRepo) GetByUserName(username string) (*model.Account, error) {
 	var account model.Account
 	if err := r.db.Where("user_name = ?", username).First(&account).Error; err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
+func (r *AccountRepo) GetByUserNameWithRole(username string) (*model.Account, error) {
+	var account model.Account
+	if err := r.db.Preload("Role").Where("user_name = ?", username).First(&account).Error; err != nil {
 		return nil, err
 	}
 	return &account, nil
@@ -54,4 +63,4 @@ func (r *AccountRepo) List(offset, limit int, preloadFields []string) ([]model.A
 		return nil, 0, err
 	}
 	return accounts, total, nil
-} 
+}

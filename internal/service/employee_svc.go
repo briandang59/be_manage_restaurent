@@ -1,12 +1,13 @@
 package service
 
 import (
-	"crypto/md5"
 	"fmt"
 	"manage_restaurent/internal/dto"
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/repository"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // EmployeeService định nghĩa các phương thức dịch vụ cho Employee
@@ -42,16 +43,17 @@ func (s *EmployeeService) CreateWithAutoAccount(dto *dto.CreateEmployeeDTO) (*mo
 	// Tạo username theo định dạng yymmdd + số thứ tự
 	now := time.Now()
 	baseUsername := fmt.Sprintf("%02d%02d%02d", now.Year()%100, now.Month(), now.Day())
-	
+
 	// Tìm số thứ tự tiếp theo cho username
 	var count int64
 	tx.Model(&model.Account{}).Where("user_name LIKE ?", baseUsername+"%").Count(&count)
 	username := fmt.Sprintf("%s%02d", baseUsername, count+1)
 
 	// Tạo account với password cố định "123456"
+	hash, _ := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
 	account := &model.Account{
 		UserName: username,
-		Password: hashPassword("123456"), // Hash password cố định
+		Password: string(hash), // bcrypt hash của "123456"
 		RoleId:   dto.RoleId,
 	}
 
@@ -59,7 +61,6 @@ func (s *EmployeeService) CreateWithAutoAccount(dto *dto.CreateEmployeeDTO) (*mo
 		tx.Rollback()
 		return nil, err
 	}
-
 
 	// Tạo employee với account_id
 	employee := &model.Employee{
@@ -82,19 +83,12 @@ func (s *EmployeeService) CreateWithAutoAccount(dto *dto.CreateEmployeeDTO) (*mo
 		return nil, err
 	}
 
-
 	// Commit transaction
 	if err := tx.Commit().Error; err != nil {
 		return nil, err
 	}
 
 	return employee, nil
-}
-
-// hashPassword hash password bằng MD5
-func hashPassword(password string) string {
-	hash := md5.Sum([]byte(password))
-	return fmt.Sprintf("%x", hash)
 }
 
 // Phương thức Update mới cho phép cập nhật một phần
@@ -144,15 +138,16 @@ func (s *EmployeeService) UpdateWithAccount(id uint, updates map[string]interfac
 		// Nếu employee chưa có account, tạo mới account
 		now := time.Now()
 		baseUsername := fmt.Sprintf("%02d%02d%02d", now.Year()%100, now.Month(), now.Day())
-		
+
 		// Tìm số thứ tự tiếp theo cho username
 		var count int64
 		tx.Model(&model.Account{}).Where("user_name LIKE ?", baseUsername+"%").Count(&count)
 		username := fmt.Sprintf("%s%02d", baseUsername, count+1)
-		
+
+		hash, _ := bcrypt.GenerateFromPassword([]byte("123456"), bcrypt.DefaultCost)
 		account := &model.Account{
 			UserName: username,
-			Password: hashPassword("123456"),
+			Password: string(hash),
 			RoleId:   getUintFromInterface(roleID),
 		}
 
