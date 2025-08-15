@@ -137,6 +137,11 @@ func (s *OrderItemService) GetByID(id uint) (*model.OrderItem, error) {
 	return s.repo.GetByID(id)
 }
 
+func (s *OrderItemService) ListByOrderID(orderID uint, offset, limit int) ([]model.OrderItem, int64, error) {
+	return s.repo.ListByOrderID(orderID, offset, limit)
+}
+
+// internal/service/order_item_service.go
 func (s *OrderItemService) List(offset, limit int) ([]model.OrderItem, int64, error) {
 	return s.repo.List(offset, limit)
 }

@@ -20,11 +20,12 @@ func NewOrderItemHandler(s *service.OrderItemService) *OrderItemHandler {
 
 // GetAll godoc
 // @Summary Lấy danh sách order item
-// @Description Lấy danh sách các món trong đơn hàng
+// @Description Lấy danh sách các món trong đơn hàng; nếu truyền order_id sẽ lọc theo đơn hàng đó
 // @Tags orderitem
 // @Produce json
 // @Param page query int false "Trang"
 // @Param page_size query int false "Số lượng mỗi trang"
+// @Param order_id query int false "Lọc theo Order ID"
 // @Success 200 {object} response.Body{data=[]model.OrderItem}
 // @Router /order-items [get]
 func (h *OrderItemHandler) GetAll(c *gin.Context) {
@@ -37,6 +38,30 @@ func (h *OrderItemHandler) GetAll(c *gin.Context) {
 		pageSize = 10
 	}
 	offset := (page - 1) * pageSize
+
+	// Nếu có order_id => gọi ListByOrderID, ngược lại => List tất cả
+	if oid := c.Query("order_id"); oid != "" {
+		oid64, err := strconv.ParseUint(oid, 10, 64)
+		if err != nil || oid64 == 0 {
+			response.Error(c, http.StatusBadRequest, "Invalid order_id")
+			return
+		}
+		orderID := uint(oid64)
+
+		list, total, err := h.svc.ListByOrderID(orderID, offset, pageSize)
+		if err != nil {
+			response.Error(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+		response.Success(c, list, &response.Pagination{
+			Page:     page,
+			PageSize: pageSize,
+			Total:    int(total),
+		})
+		return
+	}
+
+	// Không có order_id -> trả tất cả
 	list, total, err := h.svc.List(offset, pageSize)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
@@ -147,4 +172,4 @@ func (h *OrderItemHandler) Delete(c *gin.Context) {
 		return
 	}
 	response.Success(c, "OrderItem deleted successfully", nil)
-} 
+}

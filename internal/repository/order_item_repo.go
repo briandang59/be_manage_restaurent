@@ -43,13 +43,28 @@ func (r *OrderItemRepo) Delete(id uint) error {
 	return r.db.Delete(&model.OrderItem{}, id).Error
 }
 
-func (r *OrderItemRepo) List(offset, limit int) ([]model.OrderItem, int64, error) {
+// internal/repository/order_item_repo.go
+
+func (r *OrderItemRepo) ListByOrderID(orderID uint, offset, limit int) ([]model.OrderItem, int64, error) {
 	var items []model.OrderItem
 	var total int64
-	r.db.Model(&model.OrderItem{}).Count(&total)
-	if err := r.db.Preload("Order").Preload("MenuItem").Offset(offset).Limit(limit).Find(&items).Error; err != nil {
+
+	base := r.db.Model(&model.OrderItem{}).Where("order_id = ?", orderID)
+	if err := base.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
+
+	if err := r.db.
+		Preload("Order").
+		Preload("MenuItem").
+		Where("order_id = ?", orderID).
+		Offset(offset).
+		Limit(limit).
+		Order("id DESC").
+		Find(&items).Error; err != nil {
+		return nil, 0, err
+	}
+
 	return items, total, nil
 }
 
@@ -69,4 +84,24 @@ func (r *OrderItemRepo) AddOrderAmount(orderID uint, delta int64) error {
 	return r.db.Model(&model.Order{}).
 		Where("id = ?", orderID).
 		UpdateColumn("amount", gorm.Expr("COALESCE(amount,0) + ?", delta)).Error
+}
+
+// internal/repository/order_item_repo.go
+func (r *OrderItemRepo) List(offset, limit int) ([]model.OrderItem, int64, error) {
+	var items []model.OrderItem
+	var total int64
+
+	// Đếm tổng
+	if err := r.db.Model(&model.OrderItem{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Lấy danh sách (preload Order & MenuItem), sắp xếp ổn định
+	if err := r.db.Preload("Order").Preload("MenuItem").
+		Order("id DESC").
+		Offset(offset).Limit(limit).
+		Find(&items).Error; err != nil {
+		return nil, 0, err
+	}
+	return items, total, nil
 }
