@@ -114,4 +114,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	menuItemService := service.NewMenuItemService(menuItemRepo)
 	menuItemHandler := handler.NewMenuItemHandler(menuItemService)
 	MenuItemRoutes(api, menuItemHandler)
+
+	// Dependencies for Category
+	categoryRepo := repository.NewCategoryRepo(db)
+	categoryService := service.NewCategoryService(categoryRepo)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+	CategoryRoutes(api, categoryHandler)
 }

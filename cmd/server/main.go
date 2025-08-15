@@ -50,6 +50,7 @@ func main() {
 		&model.OrderItem{},
 		&model.Order{},
 		&model.File{},
+		&model.Category{},
 	); err != nil {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}
