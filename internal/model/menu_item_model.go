@@ -12,8 +12,8 @@ type MenuItem struct {
 	Name        string         `json:"name" gorm:"not null"`
 	Description string         `json:"description"`
 	Price       int64          `json:"price" gorm:"not null"`
-	CategoryID  int            `json:"category_id"`
-	Category    Category       `json:"category" gorm:"foreignKey:CategoryID"`
+	CategoryID  *uint          `json:"category_id"`
+	Category    *Category      `json:"category" gorm:"foreignKey:CategoryID"`
 	FileID      *uint          `json:"file_id"`
 	File        *File          `json:"file,omitempty" gorm:"foreignKey:FileID"`
 	Status      enum.MenuItem  `json:"status" gorm:"default:'Available';not null"`
