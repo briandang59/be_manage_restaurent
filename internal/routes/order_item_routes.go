@@ -9,7 +9,8 @@ import (
 func OrderItemRoutes(rg *gin.RouterGroup, h *handler.OrderItemHandler) {
 	rg.GET("/order-items", h.GetAll)
 	rg.GET("/order-items/:id", h.GetByID)
+	rg.GET("/order-items/order/:order_id", h.GetByOrderID)
 	rg.POST("/order-items", h.Create)
 	rg.PATCH("/order-items/:id", h.Update)
 	rg.DELETE("/order-items/:id", h.Delete)
-} 
+}

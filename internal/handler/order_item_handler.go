@@ -173,3 +173,45 @@ func (h *OrderItemHandler) Delete(c *gin.Context) {
 	}
 	response.Success(c, "OrderItem deleted successfully", nil)
 }
+
+// GetByOrderID godoc
+// @Summary Lấy danh sách order item theo OrderID
+// @Description Lấy tất cả món trong 1 đơn hàng cụ thể
+// @Tags orderitem
+// @Produce json
+// @Param order_id path int true "Order ID"
+// @Param page query int false "Trang"
+// @Param page_size query int false "Số lượng mỗi trang"
+// @Success 200 {object} response.Body{data=[]model.OrderItem}
+// @Failure 400 {object} response.ErrorResponse
+// @Router /orders/{order_id}/items [get]
+func (h *OrderItemHandler) GetByOrderID(c *gin.Context) {
+	orderIdStr := c.Param("order_id")
+	orderID, err := strconv.Atoi(orderIdStr)
+	if err != nil || orderID <= 0 {
+		response.Error(c, http.StatusBadRequest, "Invalid order_id")
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 10
+	}
+	offset := (page - 1) * pageSize
+
+	list, total, err := h.svc.ListByOrderID(uint(orderID), offset, pageSize)
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.Success(c, list, &response.Pagination{
+		Page:     page,
+		PageSize: pageSize,
+		Total:    int(total),
+	})
+}

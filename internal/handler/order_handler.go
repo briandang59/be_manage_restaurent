@@ -147,4 +147,32 @@ func (h *OrderHandler) Delete(c *gin.Context) {
 		return
 	}
 	response.Success(c, "Order deleted successfully", nil)
-} 
+}
+
+// FindByTable godoc
+// @Summary Lấy order theo bàn
+// @Description Lấy order hiện tại (chưa thanh toán) theo ID bàn
+// @Tags order
+// @Produce json
+// @Param table_id path int true "ID bàn"
+// @Success 200 {object} model.Order
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 404 {object} response.ErrorResponse
+// @Router /orders/table/{table_id} [get]
+
+func (h *OrderHandler) FindByTable(c *gin.Context) {
+	idStr := c.Param("table_id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid table ID")
+		return
+	}
+
+	order, err := h.svc.FindOrderByTable(uint(id))
+	if err != nil {
+		response.Error(c, http.StatusNotFound, "Order not found")
+		return
+	}
+
+	response.Success(c, order, nil)
+}

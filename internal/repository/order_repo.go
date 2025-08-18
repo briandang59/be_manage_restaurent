@@ -2,6 +2,7 @@ package repository
 
 import (
 	"manage_restaurent/internal/model"
+
 	"gorm.io/gorm"
 )
 
@@ -41,4 +42,13 @@ func (r *OrderRepo) List(offset, limit int) ([]model.Order, int64, error) {
 		return nil, 0, err
 	}
 	return orders, total, nil
-} 
+}
+
+func (r *OrderRepo) FindOrderByTableId(tableId uint) (*model.Order, error) {
+	var order model.Order
+
+	if err := r.db.Preload("Customer").Preload("Table").Where("table_id = ? AND status = ?", tableId, "UnPaid").First(&order).Error; err != nil {
+		return nil, err
+	}
+	return &order, nil
+}

@@ -31,4 +31,8 @@ func (s *OrderService) Delete(id uint) error {
 
 func (s *OrderService) List(offset, limit int) ([]model.Order, int64, error) {
 	return s.repo.List(offset, limit)
-} 
+}
+
+func (s *OrderService) FindOrderByTable(id uint) (*model.Order, error) {
+	return s.repo.FindOrderByTableId(id)
+}
