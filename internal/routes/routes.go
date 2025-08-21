@@ -120,4 +120,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	categoryService := service.NewCategoryService(categoryRepo)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	CategoryRoutes(api, categoryHandler)
+
+	// Dependencies for Category
+	bookingRepo := repository.NewBookingRepo(db)
+	bookingService := service.NewBookingService(bookingRepo)
+	bookingHandler := handler.NewBookingHandler(bookingService)
+	BookingRoutes(api, bookingHandler)
 }
