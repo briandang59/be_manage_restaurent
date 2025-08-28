@@ -1,31 +1,9 @@
 services:
-  db:
-    image: postgres
-    restart: always
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "5433:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   be_manage_restaurent:
     build:
       context: .
     ports:
-      - "5123:5000"
-    depends_on:
-      db:
-        condition: service_healthy 
+      - "5123:${BE_PORT}"     
     env_file:
       - .env
     environment:
@@ -34,6 +12,8 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   n8n:
     image: n8nio/n8n:latest
@@ -42,6 +22,3 @@ services:
       - "5678:5678"
     volumes:
       - ~/.n8n:/home/node/.n8n
-
-volumes:
-  db_data:
