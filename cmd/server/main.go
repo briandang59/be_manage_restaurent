@@ -51,6 +51,7 @@ func main() {
 		&model.Order{},
 		&model.File{},
 		&model.Category{},
+		&model.Booking{},
 	); err != nil {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}
