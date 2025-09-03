@@ -97,11 +97,18 @@ func (r *OrderItemRepo) List(offset, limit int) ([]model.OrderItem, int64, error
 	}
 
 	// Lấy danh sách (preload Order & MenuItem), sắp xếp ổn định
-	if err := r.db.Preload("Order").Preload("MenuItem").
+	if err := r.db.
+		Preload("Order").
+		Preload("Order.Table"). // preload Table từ Order
+		Preload("MenuItem").
+		Preload("MenuItem.File").     // preload File từ MenuItem
+		Preload("MenuItem.Category"). // preload Category từ MenuItem
 		Order("id DESC").
-		Offset(offset).Limit(limit).
+		Offset(offset).
+		Limit(limit).
 		Find(&items).Error; err != nil {
 		return nil, 0, err
 	}
+
 	return items, total, nil
 }
