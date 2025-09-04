@@ -17,8 +17,8 @@ func (s *TicketService) Create(ticket *model.Ticket) error {
 	return s.repo.Create(ticket)
 }
 
-func (s *TicketService) GetByID(id uint) (*model.Ticket, error) {
-	return s.repo.GetByID(id)
+func (s *TicketService) GetByID(id uint, preloadFields []string) (*model.Ticket, error) {
+	return s.repo.GetByID(id, preloadFields)
 }
 
 func (s *TicketService) Update(id uint, updates map[string]interface{}) error {
@@ -29,6 +29,6 @@ func (s *TicketService) Delete(id uint) error {
 	return s.repo.Delete(id)
 }
 
-func (s *TicketService) List(offset, limit int) ([]model.Ticket, int64, error) {
-	return s.repo.List(offset, limit)
-} 
+func (s *TicketService) List(offset, limit int, preloadFields []string) ([]model.Ticket, int64, error) {
+	return s.repo.List(offset, limit, preloadFields)
+}
