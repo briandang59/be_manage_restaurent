@@ -10,6 +10,7 @@ import (
 type EmployeeRepo interface {
 	FindAll(page, pageSize int, preloadFields []string) ([]model.Employee, int64, error)
 	FindByID(id uint) (*model.Employee, error)
+	FindByAccountID(accountID uint) (*model.Employee, error)
 	Create(employee *model.Employee) error
 	Update(id uint, updates map[string]interface{}) error
 	Delete(id uint) error
@@ -51,6 +52,14 @@ func (r *employeeRepo) FindAll(page, pageSize int, preloadFields []string) ([]mo
 func (r *employeeRepo) FindByID(id uint) (*model.Employee, error) {
 	var employee model.Employee
 	if err := r.db.First(&employee, id).Error; err != nil {
+		return nil, err
+	}
+	return &employee, nil
+}
+
+func (r *employeeRepo) FindByAccountID(accountID uint) (*model.Employee, error) {
+	var employee model.Employee
+	if err := r.db.Where("account_id = ?", accountID).First(&employee).Error; err != nil {
 		return nil, err
 	}
 	return &employee, nil

@@ -23,7 +23,8 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 
 	// Dependencies for Account
 	accountRepo := repository.NewAccountRepo(db)
-	accountService := service.NewAccountService(accountRepo)
+	employeeRepo := repository.NewEmployeeRepo(db)
+	accountService := service.NewAccountService(accountRepo, employeeRepo)
 	accountHandler := handler.NewAccountHandler(accountService)
 	AccountPublicRoutes(noAuth, accountHandler)
 	AccountProtectedRoutes(api, accountHandler)
@@ -41,7 +42,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	ShiftRoutes(api, shiftHandler)
 
 	// Dependencies for Employee
-	employeeRepo := repository.NewEmployeeRepo(db)
 	employeeService := service.NewEmployeeService(employeeRepo)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	EmployeeRoutes(api, employeeHandler)

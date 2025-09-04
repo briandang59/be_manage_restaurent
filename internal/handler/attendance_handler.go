@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"manage_restaurent/internal/dto"
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/service"
@@ -79,16 +80,24 @@ func (h *AttendanceHandler) GetByID(c *gin.Context) {
 // @Tags attendance
 // @Accept json
 // @Produce json
-// @Param attendance body model.Attendance true "Dữ liệu chấm công" example({"shift_schedule_id":1,"actual_start_time":"2024-07-22T08:00:00Z","actual_end_time":"2024-07-22T17:00:00Z","hours":8})
+// @Param attendance body dto.CreateAttendanceDTO true "Dữ liệu chấm công" example({"shift_schedule_id":1,"actual_start_time":"2024-07-22T08:00:00Z","actual_end_time":"2024-07-22T17:00:00Z"})
 // @Success 200 {object} model.Attendance
 // @Failure 400 {object} response.ErrorResponse
 // @Router /attendances [post]
 func (h *AttendanceHandler) Create(c *gin.Context) {
-	var attendance model.Attendance
-	if err := c.ShouldBindJSON(&attendance); err != nil {
+	var req dto.CreateAttendanceDTO
+	if err := c.ShouldBindJSON(&req); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
+
+	// Chuyển đổi DTO thành model
+	attendance := model.Attendance{
+		ShiftScheduleId: req.ShiftScheduleId,
+		ActualStartTime: req.ActualStartTime,
+		ActualEndTime:   req.ActualEndTime,
+	}
+
 	if err := h.svc.Create(&attendance); err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
@@ -103,7 +112,7 @@ func (h *AttendanceHandler) Create(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param id path int true "ID chấm công"
-// @Param updates body object true "Dữ liệu cập nhật" example({"hours":9})
+// @Param updates body object true "Dữ liệu cập nhật" example({"actual_end_time":"2024-07-22T18:00:00Z"})
 // @Success 200 {object} response.Body
 // @Failure 400 {object} response.ErrorResponse
 // @Router /attendances/{id} [patch]
@@ -147,4 +156,4 @@ func (h *AttendanceHandler) Delete(c *gin.Context) {
 		return
 	}
 	response.Success(c, "Attendance deleted successfully", nil)
-} 
+}

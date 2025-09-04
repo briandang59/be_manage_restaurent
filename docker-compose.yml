@@ -1,8 +1,6 @@
-version: "3.9"
-
 services:
   db:
-    image: postgres:17
+    image: postgres
     restart: always
     env_file:
       - .env
@@ -11,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,12 +22,18 @@ services:
     build:
       context: .
     ports:
-      - "${BE_PORT}:${BE_PORT}"
-    env_file:
-      - .env
+      - "5123:5000"
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_healthy 
+    env_file:
+      - .env
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
 
   n8n:
     image: n8nio/n8n:latest
