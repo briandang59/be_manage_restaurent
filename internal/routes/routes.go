@@ -126,4 +126,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	bookingService := service.NewBookingService(bookingRepo)
 	bookingHandler := handler.NewBookingHandler(bookingService)
 	BookingRoutes(api, bookingHandler)
+
+	// Dependencies for Stats
+	statsSvc := service.NewStatsService(db, orderRepo, ingredientRepo, attendanceRepo, orderItemRepo, &bookingRepo, &customerRepo, ticketRepo, &shiftScheduleRepo)
+	statsHandler := handler.NewStatsHandler(statsSvc)
+	StatsRoutes(api, statsHandler)
 }
