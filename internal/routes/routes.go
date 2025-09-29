@@ -79,14 +79,14 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	permissionHandler := handler.NewPermissionHandler(permissionService)
 	PermissionRoutes(api, permissionHandler)
 
-	// Dependencies for Ticket
-	ticketRepo := repository.NewTicketRepo(db)
-	ticketService := service.NewTicketService(ticketRepo)
-	ticketHandler := handler.NewTicketHandler(ticketService)
-	TicketRoutes(api, ticketHandler)
-
 	// Dependencies for Ingredient
 	ingredientRepo := repository.NewIngredientRepo(db)
+
+	// Dependencies for Ticket
+	ticketRepo := repository.NewTicketRepo(db)
+	ticketService := service.NewTicketService(ticketRepo, ingredientRepo)
+	ticketHandler := handler.NewTicketHandler(ticketService)
+	TicketRoutes(api, ticketHandler)
 	ingredientService := service.NewIngredientService(ingredientRepo)
 	ingredientHandler := handler.NewIngredientHandler(ingredientService)
 	IngredientRoutes(api, ingredientHandler)

@@ -80,14 +80,13 @@ func (h *BookingHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var booking model.Booking
-	if err := c.ShouldBindJSON(&booking); err != nil {
+	var updates map[string]interface{}
+	if err := c.ShouldBindJSON(&updates); err != nil {
 		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	booking.ID = uint(id) // ✅ gán ID
 
-	if err := h.svc.Update(&booking); err != nil {
+	if err := h.svc.Update(uint(id), updates); err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}

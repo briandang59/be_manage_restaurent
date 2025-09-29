@@ -10,7 +10,7 @@ type BookingRepo interface {
 	FindAll(page, pageSize int, preloadFields []string) ([]model.Booking, int64, error)
 	Create(booking *model.Booking) error
 	FindByID(id uint) (*model.Booking, error)
-	Update(booking *model.Booking) error
+	Update(id uint, updates map[string]interface{}) error
 	Delete(id uint) error
 }
 
@@ -60,6 +60,6 @@ func (r *bookingRepo) Delete(id uint) error {
 	return r.db.Delete(&model.Booking{}, id).Error
 }
 
-func (r *bookingRepo) Update(booking *model.Booking) error {
-	return r.db.Save(booking).Error
+func (r *bookingRepo) Update(id uint, updates map[string]interface{}) error {
+	return r.db.Model(&model.Booking{}).Where("id = ?", id).Updates(updates).Error
 }
