@@ -131,4 +131,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	statsSvc := service.NewStatsService(db, orderRepo, ingredientRepo, attendanceRepo, orderItemRepo, &bookingRepo, &customerRepo, ticketRepo, &shiftScheduleRepo)
 	statsHandler := handler.NewStatsHandler(statsSvc)
 	StatsRoutes(api, statsHandler)
+
+	salaryService := service.NewSalaryService(db, attendanceRepo, &shiftScheduleRepo)
+	salaryHandler := handler.NewSalaryHandler(salaryService)
+	SalaryRoutes(api, salaryHandler)
+
 }
