@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"fmt"
 	"manage_restaurent/internal/model"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -67,7 +69,78 @@ func (r *shiftScheduleRepo) Create(shiftSchedule *model.ShiftSchedule) error {
 }
 
 func (r *shiftScheduleRepo) BulkCreate(shiftSchedules []model.ShiftSchedule) error {
-	return r.db.Create(&shiftSchedules).Error
+	// 1. Thu thập tất cả các cặp EmployeeID và Date từ dữ liệu đầu vào
+	var existingChecks []struct {
+		EmployeeID uint
+		Date       string
+	}
+
+	// Lặp qua dữ liệu đầu vào để tạo danh sách cần kiểm tra
+	for _, schedule := range shiftSchedules {
+		if schedule.EmployeeID != nil && schedule.Date != "" {
+			existingChecks = append(existingChecks, struct {
+				EmployeeID uint
+				Date       string
+			}{
+				EmployeeID: *schedule.EmployeeID,
+				Date:       schedule.Date,
+			})
+		}
+	}
+
+	if len(existingChecks) == 0 {
+		return nil // Không có dữ liệu hợp lệ để tạo
+	}
+
+	// 2. Xây dựng truy vấn để tìm các bản ghi đã tồn tại
+	// Sử dụng OR kết hợp các điều kiện (employee_id = ? AND date = ?)
+	query := r.db.Model(&model.ShiftSchedule{})
+	var subQueries []string
+	var args []interface{}
+
+	for _, check := range existingChecks {
+		subQueries = append(subQueries, "(employee_id = ? AND date = ?)")
+		args = append(args, check.EmployeeID, check.Date)
+	}
+
+	// Kết hợp tất cả các điều kiện phụ bằng OR
+	whereClause := "(" + strings.Join(subQueries, " OR ") + ")"
+
+	// 3. Truy vấn DB để lấy các bản ghi đã tồn tại
+	var existingRecords []model.ShiftSchedule
+	err := query.Where(whereClause, args...).Find(&existingRecords).Error
+	if err != nil {
+		return err // Lỗi khi truy vấn
+	}
+
+	// 4. Tạo Map các bản ghi đã tồn tại để tra cứu nhanh
+	existingMap := make(map[string]bool)
+	for _, record := range existingRecords {
+		// Key: "employeeID_date" (ví dụ: "2_2025-10-17")
+		key := fmt.Sprintf("%d_%s", *record.EmployeeID, record.Date)
+		existingMap[key] = true
+	}
+
+	// 5. Lọc danh sách đầu vào, chỉ giữ lại các bản ghi CHƯA tồn tại
+	var newSchedulesToCreate []model.ShiftSchedule
+	for _, schedule := range shiftSchedules {
+		if schedule.EmployeeID != nil && schedule.Date != "" {
+			key := fmt.Sprintf("%d_%s", *schedule.EmployeeID, schedule.Date)
+			if !existingMap[key] {
+				newSchedulesToCreate = append(newSchedulesToCreate, schedule)
+				// Đánh dấu vào map để tránh trùng lặp trong chính file đầu vào
+				existingMap[key] = true
+			}
+		}
+	}
+
+	if len(newSchedulesToCreate) == 0 {
+		// fmt.Println("Không có bản ghi mới nào để chèn.")
+		return nil
+	}
+
+	// 6. Thực hiện Bulk Create với các bản ghi mới
+	return r.db.Create(&newSchedulesToCreate).Error
 }
 
 func (r *shiftScheduleRepo) Update(id uint, updates map[string]interface{}) error {
