@@ -28,19 +28,36 @@ func (s *AttendanceService) GetByID(id uint) (*model.Attendance, error) {
 }
 
 func (s *AttendanceService) Update(id uint, updates map[string]interface{}) error {
-	// Nếu cập nhật actual_start_time hoặc actual_end_time, tự động tính lại hours
-	if startTime, hasStartTime := updates["actual_start_time"]; hasStartTime {
-		if endTime, hasEndTime := updates["actual_end_time"]; hasEndTime {
-			if start, ok := startTime.(time.Time); ok {
-				if end, ok := endTime.(time.Time); ok {
-					if !start.IsZero() && !end.IsZero() {
-						duration := end.Sub(start)
-						updates["hours"] = int64(duration.Hours())
-					}
-				}
-			}
+	var start, end time.Time
+	var hasStart, hasEnd bool
+
+	// parse actual_start_time
+	if startStr, ok := updates["actual_start_time"].(string); ok {
+		parsedStart, err := time.Parse(time.RFC3339, startStr)
+		if err == nil {
+			start = parsedStart
+			updates["actual_start_time"] = parsedStart
+			hasStart = true
 		}
 	}
+
+	// parse actual_end_time
+	if endStr, ok := updates["actual_end_time"].(string); ok {
+		parsedEnd, err := time.Parse(time.RFC3339, endStr)
+		if err == nil {
+			end = parsedEnd
+			updates["actual_end_time"] = parsedEnd
+			hasEnd = true
+		}
+	}
+
+	// Tự động tính giờ nếu đủ 2 field
+	if hasStart && hasEnd && !start.IsZero() && !end.IsZero() {
+		duration := end.Sub(start)
+		hours := duration.Hours()
+		updates["hours"] = hours
+	}
+
 	return s.repo.Update(id, updates)
 }
 
