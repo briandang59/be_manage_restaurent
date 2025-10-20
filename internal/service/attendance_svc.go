@@ -48,6 +48,6 @@ func (s *AttendanceService) Delete(id uint) error {
 	return s.repo.Delete(id)
 }
 
-func (s *AttendanceService) List(offset, limit int) ([]model.Attendance, int64, error) {
-	return s.repo.List(offset, limit)
+func (s *AttendanceService) List(employeeID *uint, offset, limit int) ([]model.Attendance, int64, error) {
+	return s.repo.List(employeeID, offset, limit)
 }
