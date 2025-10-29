@@ -56,19 +56,35 @@ func main() {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}
 
-	// Seed roles và permissions chỉ khi lần đầu (nếu chưa có dữ liệu)
+	// =========================================================
+	// 💡 LOGIC CHẠY SEED DATA
+	// =========================================================
 	var roleCount int64
 	var permCount int64
 	db.Model(&model.Role{}).Count(&roleCount)
 	db.Model(&model.Permission{}).Count(&permCount)
+
+	// Chỉ chạy seeding (Go code và SQL file) nếu database trống
 	if roleCount == 0 || permCount == 0 {
+		// 1. Chạy seed roles và permissions (Go code)
 		model.SeedRolesAndPermissions(db)
 		log.Println("✅ Đã seed roles và permissions mẫu!")
-	}
 
+		// 2. Chạy file SQL seed data (Dữ liệu lớn từ production/staging)
+
+	} else {
+		log.Printf("ℹ️  Database đã có dữ liệu (%d roles, %d perms). Bỏ qua seeding.", roleCount, permCount)
+	}
+	// =========================================================
+	seedFilePath := "go_db_seed_data.sql"
+	if err := model.RunSQLSeedFile(db, seedFilePath); err != nil {
+		// Lỗi khi thực thi SQL là lỗi nghiêm trọng, dừng ứng dụng
+		log.Fatalf("❌ Lỗi nghiêm trọng khi chạy file seed SQL: %v", err)
+	}
 	// Tạo router
 	r := gin.Default()
 	r.Use(middlewares.CORSMiddleware())
+
 	// Swagger endpoint
 	docs.SwaggerInfo.BasePath = "/api"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
