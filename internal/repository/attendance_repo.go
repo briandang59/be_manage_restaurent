@@ -2,6 +2,7 @@ package repository
 
 import (
 	"manage_restaurent/internal/model"
+
 	"gorm.io/gorm"
 )
 
@@ -33,12 +34,37 @@ func (r *AttendanceRepo) Delete(id uint) error {
 	return r.db.Delete(&model.Attendance{}, id).Error
 }
 
-func (r *AttendanceRepo) List(offset, limit int) ([]model.Attendance, int64, error) {
+func (r *AttendanceRepo) List(employeeID *uint, offset, limit int) ([]model.Attendance, int64, error) {
 	var attendances []model.Attendance
 	var total int64
-	r.db.Model(&model.Attendance{}).Count(&total)
-	if err := r.db.Preload("ShiftSchedule").Offset(offset).Limit(limit).Find(&attendances).Error; err != nil {
+
+	// Khởi tạo truy vấn cơ sở
+	query := r.db.Model(&model.Attendance{})
+
+	// Thêm điều kiện lọc nếu employeeID được cung cấp
+	if employeeID != nil {
+		// GORM cần JOIN với ShiftSchedule để truy cập EmployeeID
+		query = query.
+			Joins("JOIN shift_schedules ON shift_schedules.id = attendances.shift_schedule_id").
+			Where("shift_schedules.employee_id = ?", *employeeID)
+	}
+
+	// 1. Đếm tổng số lượng bản ghi (trước khi áp dụng offset/limit)
+	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
+
+	// 2. Thực hiện truy vấn lấy dữ liệu
+	if err := query.
+		// Preload các mối quan hệ (tôi thêm Preload cho Employee và Shift để dữ liệu đầy đủ hơn)
+		Preload("ShiftSchedule").
+		Preload("ShiftSchedule.Employee").
+		Preload("ShiftSchedule.Shift").
+		Offset(offset).
+		Limit(limit).
+		Find(&attendances).Error; err != nil {
+		return nil, 0, err
+	}
+
 	return attendances, total, nil
-} 
+}

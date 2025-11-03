@@ -23,7 +23,8 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 
 	// Dependencies for Account
 	accountRepo := repository.NewAccountRepo(db)
-	accountService := service.NewAccountService(accountRepo)
+	employeeRepo := repository.NewEmployeeRepo(db)
+	accountService := service.NewAccountService(accountRepo, employeeRepo)
 	accountHandler := handler.NewAccountHandler(accountService)
 	AccountPublicRoutes(noAuth, accountHandler)
 	AccountProtectedRoutes(api, accountHandler)
@@ -41,7 +42,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	ShiftRoutes(api, shiftHandler)
 
 	// Dependencies for Employee
-	employeeRepo := repository.NewEmployeeRepo(db)
 	employeeService := service.NewEmployeeService(employeeRepo)
 	employeeHandler := handler.NewEmployeeHandler(employeeService)
 	EmployeeRoutes(api, employeeHandler)
@@ -79,14 +79,14 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	permissionHandler := handler.NewPermissionHandler(permissionService)
 	PermissionRoutes(api, permissionHandler)
 
-	// Dependencies for Ticket
-	ticketRepo := repository.NewTicketRepo(db)
-	ticketService := service.NewTicketService(ticketRepo)
-	ticketHandler := handler.NewTicketHandler(ticketService)
-	TicketRoutes(api, ticketHandler)
-
 	// Dependencies for Ingredient
 	ingredientRepo := repository.NewIngredientRepo(db)
+
+	// Dependencies for Ticket
+	ticketRepo := repository.NewTicketRepo(db)
+	ticketService := service.NewTicketService(ticketRepo, ingredientRepo)
+	ticketHandler := handler.NewTicketHandler(ticketService)
+	TicketRoutes(api, ticketHandler)
 	ingredientService := service.NewIngredientService(ingredientRepo)
 	ingredientHandler := handler.NewIngredientHandler(ingredientService)
 	IngredientRoutes(api, ingredientHandler)
@@ -126,4 +126,14 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	bookingService := service.NewBookingService(bookingRepo)
 	bookingHandler := handler.NewBookingHandler(bookingService)
 	BookingRoutes(api, bookingHandler)
+
+	// Dependencies for Stats
+	statsSvc := service.NewStatsService(db, orderRepo, ingredientRepo, attendanceRepo, orderItemRepo, &bookingRepo, &customerRepo, ticketRepo, &shiftScheduleRepo)
+	statsHandler := handler.NewStatsHandler(statsSvc)
+	StatsRoutes(api, statsHandler)
+
+	salaryService := service.NewSalaryService(db, attendanceRepo, &shiftScheduleRepo)
+	salaryHandler := handler.NewSalaryHandler(salaryService)
+	SalaryRoutes(api, salaryHandler)
+
 }

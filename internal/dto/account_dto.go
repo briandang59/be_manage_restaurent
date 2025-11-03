@@ -20,7 +20,8 @@ type LoginRequestDTO struct {
 }
 
 type LoginResponseDTO struct {
-	Token string      `json:"token"`
-	User  interface{} `json:"user"`
-	Role  interface{} `json:"role"`
+	Token    string      `json:"token"`
+	User     interface{} `json:"user"`
+	Role     interface{} `json:"role"`
+	Employee interface{} `json:"employee,omitempty"`
 }

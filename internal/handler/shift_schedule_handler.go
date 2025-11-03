@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/service"
@@ -103,11 +104,21 @@ func (h *ShiftScheduleHandler) GetByID(c *gin.Context) {
 // @Failure 400 {object} response.ErrorResponse
 // @Router /shifts-chedules [post]
 func (h *ShiftScheduleHandler) Create(c *gin.Context) {
+	// Read the raw body first to determine if it's an array or single object
+	body, err := c.GetRawData()
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Failed to read request body")
+		return
+	}
+
 	var shiftSchedules []model.ShiftSchedule
-	if err := c.ShouldBindJSON(&shiftSchedules); err != nil {
+
+	// Try to parse as array first
+	if err := json.Unmarshal(body, &shiftSchedules); err != nil {
+		// If array parsing fails, try to parse as single object
 		var shiftSchedule model.ShiftSchedule
-		if err := c.ShouldBindJSON(&shiftSchedule); err != nil {
-			response.Error(c, http.StatusBadRequest, err.Error())
+		if err := json.Unmarshal(body, &shiftSchedule); err != nil {
+			response.Error(c, http.StatusBadRequest, "Invalid JSON format. Expected array or single object")
 			return
 		}
 		shiftSchedules = append(shiftSchedules, shiftSchedule)

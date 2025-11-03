@@ -13,6 +13,7 @@ type Ticket struct {
 	Quantity     int64           `json:"quantity"`
 	Unit         string          `json:"unit" gorm:"not null"`
 	TicketType   enum.TicketType `json:"ticket_type"`
+	Ingredient   *Ingredient     `json:"ingredient,omitempty" gorm:"foreignKey:IngredientId"`
 	CreatedAt    time.Time       `json:"created_at"`
 	UpdatedAt    time.Time       `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt  `json:"-" gorm:"index"`

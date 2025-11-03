@@ -4,6 +4,7 @@ import (
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/service"
+	"manage_restaurent/utils"
 	"net/http"
 	"strconv"
 
@@ -37,7 +38,8 @@ func (h *TicketHandler) GetAll(c *gin.Context) {
 		pageSize = 10
 	}
 	offset := (page - 1) * pageSize
-	list, total, err := h.svc.List(offset, pageSize)
+	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
+	list, total, err := h.svc.List(offset, pageSize, preloadFields)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
@@ -65,7 +67,8 @@ func (h *TicketHandler) GetByID(c *gin.Context) {
 		response.Error(c, http.StatusBadRequest, "Invalid ID")
 		return
 	}
-	ticket, err := h.svc.GetByID(uint(id))
+	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
+	ticket, err := h.svc.GetByID(uint(id), preloadFields)
 	if err != nil {
 		response.Error(c, http.StatusNotFound, "Ticket not found")
 		return
@@ -147,4 +150,4 @@ func (h *TicketHandler) Delete(c *gin.Context) {
 		return
 	}
 	response.Success(c, "Ticket deleted successfully", nil)
-} 
+}

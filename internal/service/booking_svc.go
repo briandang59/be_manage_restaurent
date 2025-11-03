@@ -21,8 +21,8 @@ func (s *BookingService) GetByID(id uint) (*model.Booking, error) {
 	return s.repo.FindByID(id)
 }
 
-func (s *BookingService) Update(booking *model.Booking) error {
-	return s.repo.Update(booking)
+func (s *BookingService) Update(id uint, updates map[string]interface{}) error {
+	return s.repo.Update(id, updates)
 }
 
 func (s *BookingService) Delete(id uint) error {

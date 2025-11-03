@@ -24,11 +24,12 @@ func getJWTSecret() []byte {
 }
 
 type AccountService struct {
-	repo *repository.AccountRepo
+	repo         *repository.AccountRepo
+	employeeRepo repository.EmployeeRepo
 }
 
-func NewAccountService(r *repository.AccountRepo) *AccountService {
-	return &AccountService{repo: r}
+func NewAccountService(r *repository.AccountRepo, employeeRepo repository.EmployeeRepo) *AccountService {
+	return &AccountService{repo: r, employeeRepo: employeeRepo}
 }
 
 func (s *AccountService) Create(account *model.Account) error {
@@ -107,9 +108,30 @@ func (s *AccountService) Login(username, password string) (*dto.LoginResponseDTO
 		}
 	}
 
+	// Get employee info if exists
+	var employeeInfo interface{}
+	employee, err := s.employeeRepo.FindByAccountID(acc.ID)
+	if err == nil && employee != nil {
+		employeeInfo = map[string]interface{}{
+			"id":              employee.ID,
+			"full_name":       employee.FullName,
+			"gender":          employee.Gender,
+			"birthday":        employee.Birthday,
+			"phone_number":    employee.PhoneNumber,
+			"email":           employee.Email,
+			"schedule_type":   employee.ScheduleType,
+			"address":         employee.Address,
+			"join_date":       employee.JoinDate,
+			"base_salary":     employee.BaseSalary,
+			"salary_per_hour": employee.SalaryPerHour,
+			"avatar_file_id":  employee.AvatarFileID,
+		}
+	}
+
 	return &dto.LoginResponseDTO{
-		Token: tokenString,
-		User:  userInfo,
-		Role:  roleInfo,
+		Token:    tokenString,
+		User:     userInfo,
+		Role:     roleInfo,
+		Employee: employeeInfo,
 	}, nil
 }

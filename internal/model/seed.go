@@ -2,6 +2,8 @@ package model
 
 import (
 	"log"
+	"os"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -91,4 +93,34 @@ func SeedAdminAccount(db *gorm.DB) {
 		log.Println("   Password: 123456")
 		log.Println("   Role: Admin")
 	}
+}
+
+func RunSQLSeedFile(db *gorm.DB, filePath string) error {
+	// 1. Đọc nội dung file
+	// os.ReadFile yêu cầu import "os"
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		log.Printf("⚠️  Không tìm thấy hoặc không thể đọc file seed: %s. Bỏ qua seeding.", filePath)
+		return nil
+	}
+
+	// 2. Chuẩn bị nội dung SQL
+	// strings.TrimSpace yêu cầu import "strings"
+	sqlContent := strings.TrimSpace(string(content))
+
+	if sqlContent == "" {
+		log.Println("⚠️  File seed rỗng, không có dữ liệu để chạy.")
+		return nil
+	}
+
+	// 3. Thực thi toàn bộ chuỗi SQL bằng GORM db.Exec
+	result := db.Exec(sqlContent)
+
+	if result.Error != nil {
+		log.Printf("❌ Lỗi khi thực thi seed SQL: %v", result.Error)
+		return result.Error
+	}
+
+	log.Printf("✅ Đã thực thi file seed: %s", filePath)
+	return nil
 }
