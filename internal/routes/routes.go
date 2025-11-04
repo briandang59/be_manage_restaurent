@@ -19,7 +19,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 		})
 	})
 	api := r.Group("/api", middlewares.AuthMiddleware())
+
 	noAuth := r.Group("/auth")
+	noAuth2 := r.Group("/api")
 
 	// Dependencies for Account
 	accountRepo := repository.NewAccountRepo(db)
@@ -127,6 +129,10 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	bookingHandler := handler.NewBookingHandler(bookingService)
 	BookingRoutes(api, bookingHandler)
 
+	recuitmentRepo := repository.NewRecruitmentRepo(db)
+	recruitmentService := service.NewRecruitmentService(recuitmentRepo)
+	recruitmentHandler := handler.NewRecruitmentHandler(recruitmentService)
+	RecruitmentRoutes(noAuth2, recruitmentHandler)
 	// Dependencies for Stats
 	statsSvc := service.NewStatsService(db, orderRepo, ingredientRepo, attendanceRepo, orderItemRepo, &bookingRepo, &customerRepo, ticketRepo, &shiftScheduleRepo)
 	statsHandler := handler.NewStatsHandler(statsSvc)
