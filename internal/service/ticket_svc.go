@@ -34,7 +34,14 @@ func (s *TicketService) Create(ticket *model.Ticket) error {
 	// if ingredient.Unit != ticket.Unit {
 	// 	return fmt.Errorf("unit mismatch: ingredient unit is %s but ticket unit is %s", ingredient.Unit, ticket.Unit)
 	// }
-
+	if ticket.TicketType == "Export" {
+		if ingredient.Quantity == 0 {
+			return fmt.Errorf("đã hết hàng")
+		}
+		if ticket.Quantity > ingredient.Quantity {
+			return fmt.Errorf("không đủ số lượng trong kho: chỉ còn %d %s", ingredient.Quantity, ingredient.Unit)
+		}
+	}
 	// Tạo ticket trước
 	if err := s.repo.Create(ticket); err != nil {
 		return err
@@ -64,8 +71,7 @@ func (s *TicketService) Create(ticket *model.Ticket) error {
 		return err
 	}
 
-	// Kiểm tra nếu quantity mới nhỏ hơn warning quantity
-	if newQuantity < ingredient.WarningQuantity {
+	if newQuantity <= ingredient.WarningQuantity {
 		// Gửi thông báo Telegram
 		botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
 		chatID := utils.TelegramChatID
