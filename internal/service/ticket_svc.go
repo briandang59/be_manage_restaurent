@@ -1,17 +1,26 @@
 package service
 
 import (
+	"fmt"
+	"os"
+
 	"manage_restaurent/internal/model"
 	"manage_restaurent/internal/repository"
+	"manage_restaurent/utils"
 )
 
 type TicketService struct {
-	repo           *repository.TicketRepo
-	ingredientRepo *repository.IngredientRepo
+	repo            *repository.TicketRepo
+	ingredientRepo  *repository.IngredientRepo
+	telegramService *TelegramService
 }
 
-func NewTicketService(r *repository.TicketRepo, ingredientRepo *repository.IngredientRepo) *TicketService {
-	return &TicketService{repo: r, ingredientRepo: ingredientRepo}
+func NewTicketService(r *repository.TicketRepo, ingredientRepo *repository.IngredientRepo, telegramSvc *TelegramService) *TicketService {
+	return &TicketService{
+		repo:            r,
+		ingredientRepo:  ingredientRepo,
+		telegramService: telegramSvc,
+	}
 }
 
 func (s *TicketService) Create(ticket *model.Ticket) error {
@@ -50,7 +59,41 @@ func (s *TicketService) Create(ticket *model.Ticket) error {
 	updates := map[string]interface{}{
 		"quantity": newQuantity,
 	}
-	return s.ingredientRepo.Update(ticket.IngredientId, updates)
+
+	if err := s.ingredientRepo.Update(ticket.IngredientId, updates); err != nil {
+		return err
+	}
+
+	// Kiểm tra nếu quantity mới nhỏ hơn warning quantity
+	if newQuantity < ingredient.WarningQuantity {
+		// Gửi thông báo Telegram
+		botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
+		chatID := utils.TelegramChatID
+		if botToken == "" || chatID == "" {
+			// Log error nếu cần, nhưng không throw để tránh ảnh hưởng business logic
+			fmt.Printf("Telegram config missing: BOT_TOKEN or CHAT_ID not set\n")
+			return nil
+		}
+		message := fmt.Sprintf("Cảnh báo: Nguyên liệu '%s' chỉ còn %d %s. Giới hạn cảnh báo: %d %s.",
+			ingredient.Name,
+			newQuantity,
+			ticket.Unit,
+			ingredient.WarningQuantity,
+			ticket.Unit,
+		)
+		req := model.TelegramSendRequest{
+			BotToken: botToken,
+			ChatID:   chatID,
+			Message:  message,
+		}
+		_, err := s.telegramService.SendMessage(req)
+		if err != nil {
+			// Không throw error, chỉ log nếu cần, để không ảnh hưởng business logic
+			fmt.Printf("Failed to send Telegram notification: %v\n", err)
+		}
+	}
+
+	return nil
 }
 
 func (s *TicketService) GetByID(id uint, preloadFields []string) (*model.Ticket, error) {

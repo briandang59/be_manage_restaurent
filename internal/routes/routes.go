@@ -84,9 +84,13 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	// Dependencies for Ingredient
 	ingredientRepo := repository.NewIngredientRepo(db)
 
+	telegramRepo := repository.NewTelegramRepo()
+	telegramService := service.NewTelegramService(telegramRepo)
+	telegramHandler := handler.NewTelegramHandler(telegramService)
+	TelegramRoutes(api, telegramHandler)
 	// Dependencies for Ticket
 	ticketRepo := repository.NewTicketRepo(db)
-	ticketService := service.NewTicketService(ticketRepo, ingredientRepo)
+	ticketService := service.NewTicketService(ticketRepo, ingredientRepo, telegramService)
 	ticketHandler := handler.NewTicketHandler(ticketService)
 	TicketRoutes(api, ticketHandler)
 	ingredientService := service.NewIngredientService(ingredientRepo)
@@ -146,10 +150,5 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	salaryService := service.NewSalaryService(db, attendanceRepo, &shiftScheduleRepo)
 	salaryHandler := handler.NewSalaryHandler(salaryService)
 	SalaryRoutes(api, salaryHandler)
-
-	telegramRepo := repository.NewTelegramRepo()
-	telegramService := service.NewTelegramService(telegramRepo)
-	telegramHandler := handler.NewTelegramHandler(telegramService)
-	TelegramRoutes(api, telegramHandler)
 
 }
