@@ -147,4 +147,9 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	salaryHandler := handler.NewSalaryHandler(salaryService)
 	SalaryRoutes(api, salaryHandler)
 
+	telegramRepo := repository.NewTelegramRepo()
+	telegramService := service.NewTelegramService(telegramRepo)
+	telegramHandler := handler.NewTelegramHandler(telegramService)
+	TelegramRoutes(api, telegramHandler)
+
 }
