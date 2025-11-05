@@ -43,8 +43,9 @@ func (r *tableRepo) FindAll(page, pageSize int, preloadFields []string) ([]model
 	}
 	return list, total, nil
 }
+
 func (r *tableRepo) Create(table *model.Table) error {
-	return r.db.Create(&table).Error
+	return r.db.Create(table).Error
 }
 
 func (r *tableRepo) Update(id uint, updates map[string]interface{}) error {

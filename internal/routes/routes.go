@@ -60,8 +60,11 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	shiftScheduleHandler := handler.NewShiftScheduleHandler(shiftScheduleService)
 	ShiftScheduleRoutes(api, shiftScheduleHandler)
 
+	// Dependencies for Order (moved up to inject into TableService)
+	orderRepo := repository.NewOrderRepo(db)
+
 	TableRepo := repository.NewTableRepo(db)
-	TableSVC := service.NewTableService(TableRepo)
+	TableSVC := service.NewTableService(TableRepo, orderRepo)
 	TableHandler := handler.NewTableHandler(TableSVC)
 	TableRoutes(api, TableHandler)
 
@@ -109,8 +112,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	orderItemHandler := handler.NewOrderItemHandler(orderItemService)
 	OrderItemRoutes(api, orderItemHandler)
 
-	// Dependencies for Order
-	orderRepo := repository.NewOrderRepo(db)
+	// Dependencies for Order (service/handler/routes using existing orderRepo)
 	orderService := service.NewOrderService(orderRepo)
 	orderHandler := handler.NewOrderHandler(orderService)
 	OrderRoutes(api, orderHandler)
