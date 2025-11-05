@@ -133,6 +133,11 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
 	recruitmentService := service.NewRecruitmentService(recuitmentRepo)
 	recruitmentHandler := handler.NewRecruitmentHandler(recruitmentService)
 	RecruitmentRoutes(noAuth2, recruitmentHandler)
+
+	applyRecuitmentRepo := repository.NewApplyRecruitmentRepo(db)
+	applyRecruitmentService := service.NewApplyRecruitmentService(applyRecuitmentRepo)
+	applyRecruitmentHandler := handler.NewApplyRecruitmentHandler(applyRecruitmentService)
+	ApplyRecruitmentRoutes(noAuth2, applyRecruitmentHandler)
 	// Dependencies for Stats
 	statsSvc := service.NewStatsService(db, orderRepo, ingredientRepo, attendanceRepo, orderItemRepo, &bookingRepo, &customerRepo, ticketRepo, &shiftScheduleRepo)
 	statsHandler := handler.NewStatsHandler(statsSvc)

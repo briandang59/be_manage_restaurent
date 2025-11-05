@@ -53,6 +53,7 @@ func main() {
 		&model.Category{},
 		&model.Booking{},
 		&model.Recruitment{},
+		&model.ApplyRecruitment{},
 	); err != nil {
 		log.Fatal("❌ AutoMigrate lỗi:", err)
 	}
