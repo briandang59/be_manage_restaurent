@@ -7,11 +7,8 @@ import (
 )
 
 func ApplyRecruitmentRoutes(rg *gin.RouterGroup, h *handler.ApplyRecruitmentHandler) {
-	apply := rg.Group("/apply-recruitments")
-	{
-		apply.GET("/", h.GetAll)
-		apply.POST("/", h.Create)
-		apply.PATCH("/:id", h.Update)
-		apply.DELETE("/:id", h.Delete)
-	}
+	rg.GET("/apply-recruitments", h.GetAll)
+	rg.POST("/apply-recruitments", h.Create)
+	rg.PATCH("/apply-recruitments/:id", h.Update)
+	rg.DELETE("/apply-recruitments/:id", h.Delete)
 }
