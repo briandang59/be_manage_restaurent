@@ -121,6 +121,7 @@ func (s *StatsService) EmployeesStats(fromDate, toDate string) (map[string]inter
 		return nil, err
 	}
 
+	// Query cho total_hours tổng (giữ nguyên logic)
 	query := s.db.Model(&model.Attendance{})
 	if !start.IsZero() {
 		query = query.Where("actual_start_time >= ?", start)
@@ -132,20 +133,100 @@ func (s *StatsService) EmployeesStats(fromDate, toDate string) (map[string]inter
 	var totalHours int64
 	query.Select("SUM(hours) as total").Scan(&totalHours)
 
-	type EmployeeHour struct {
-		EmployeeID uint  `json:"employee_id"`
-		TotalHours int64 `json:"total_hours"`
+	// Query cho employee stats với đầy đủ info và tính salary
+	// Giả sử: FULLTIME: lương giờ = (base_salary / 26 / 8) * total_hours
+	// PARTTIME: salary_per_hour * total_hours
+	// Hardcode 26 ngày/tháng, 8 giờ/ngày cho FULLTIME
+	const daysPerMonth = 26
+	const hoursPerDay = 8
+
+	type EmployeeStat struct {
+		ID            uint                      `json:"id"`
+		FullName      string                    `json:"full_name"`
+		Gender        bool                      `json:"gender"`
+		Birthday      string                    `json:"birthday"`
+		PhoneNumber   string                    `json:"phone_number"`
+		Email         string                    `json:"email"`
+		ScheduleType  enum.EmployeeScheduleType `json:"schedule_type"`
+		Address       string                    `json:"address"`
+		JoinDate      string                    `json:"join_date"`
+		BaseSalary    int64                     `json:"base_salary"`
+		SalaryPerHour int64                     `json:"salary_per_hour"`
+		AvatarFileID  *uint                     `json:"avatar_file_id"`
+		TotalHours    int64                     `json:"total_hours"`
+		Salary        int64                     `json:"salary"` // Tính sau khi scan
+		// Có thể thêm AvatarFile info nếu JOIN files, nhưng giữ đơn giản
 	}
-	var employeeHours []EmployeeHour
-	s.db.Model(&model.Attendance{}).
-		Select("shift_schedules.employee_id, SUM(hours) as total_hours").
+	var employeeStats []EmployeeStat
+
+	empQuery := s.db.Model(&model.Attendance{}).
 		Joins("JOIN shift_schedules ON attendances.shift_schedule_id = shift_schedules.id").
-		Group("shift_schedules.employee_id").
-		Scan(&employeeHours)
+		Joins("LEFT JOIN employees ON shift_schedules.employee_id = employees.id") // LEFT nếu cần, nhưng giả sử luôn có
+	if !start.IsZero() {
+		empQuery = empQuery.Where("attendances.actual_start_time >= ?", start)
+	}
+	if !end.IsZero() {
+		empQuery = empQuery.Where("attendances.actual_end_time <= ?", end)
+	}
+
+	// Select tất cả fields non-aggregate từ employees + SUM(hours)
+	empQuery.Select(`
+		employees.id,
+		employees.full_name,
+		employees.gender,
+		employees.birthday,
+		employees.phone_number,
+		employees.email,
+		employees.schedule_type,
+		employees.address,
+		employees.join_date,
+		employees.base_salary,
+		employees.salary_per_hour,
+		employees.avatar_file_id,
+		SUM(attendances.hours) as total_hours
+	`).
+		Group(`
+		employees.id,
+		employees.full_name,
+		employees.gender,
+		employees.birthday,
+		employees.phone_number,
+		employees.email,
+		employees.schedule_type,
+		employees.address,
+		employees.join_date,
+		employees.base_salary,
+		employees.salary_per_hour,
+		employees.avatar_file_id
+	`).
+		Scan(&employeeStats)
+
+	// Tính salary sau khi scan
+	for i := range employeeStats {
+		stat := &employeeStats[i]
+		if stat.TotalHours == 0 {
+			stat.Salary = 0
+			continue
+		}
+		switch stat.ScheduleType {
+		case "FULLTIME": // Giả sử enum.FullTime tồn tại; thay bằng giá trị thực nếu khác
+			if stat.BaseSalary > 0 {
+				dailySalary := stat.BaseSalary / daysPerMonth
+				hourlySalary := dailySalary / hoursPerDay
+				stat.Salary = hourlySalary * stat.TotalHours
+			} else {
+				stat.Salary = 0
+			}
+		case "PARTTIME": // Giả sử enum.PartTime tồn tại
+			stat.Salary = stat.SalaryPerHour * stat.TotalHours
+		default:
+			stat.Salary = 0
+		}
+	}
 
 	return map[string]interface{}{
 		"total_hours":    totalHours,
-		"employee_hours": employeeHours,
+		"employee_stats": employeeStats, // Thay vì employee_hours, dùng stats đầy đủ
 	}, nil
 }
 
@@ -159,21 +240,34 @@ func (s *StatsService) OrdersStats(fromDate, toDate string) (map[string]interfac
 		return nil, err
 	}
 
-	query := s.db.Model(&model.OrderItem{})
+	// Thêm JOIN với menu_items và files
+	query := s.db.Model(&model.OrderItem{}).
+		Joins("JOIN menu_items ON order_items.menu_item_id = menu_items.id").
+		Joins("LEFT JOIN files ON menu_items.file_id = files.id") // LEFT JOIN vì File có thể optional
 	if !start.IsZero() {
-		query = query.Where("created_at >= ?", start)
+		query = query.Where("order_items.created_at >= ?", start)
 	}
 	if !end.IsZero() {
-		query = query.Where("created_at <= ?", end)
+		query = query.Where("order_items.created_at <= ?", end)
 	}
 
+	// Cập nhật struct để chứa thêm info từ File
 	type TopItem struct {
-		MenuItemID uint  `json:"menu_item_id"`
-		TotalQty   int64 `json:"total_qty"`
+		MenuItemID  uint   `json:"menu_item_id"`
+		Name        string `json:"name"`
+		Description string `json:"description"`
+		Price       int64  `json:"price"`
+		TotalQty    int64  `json:"total_qty"`
+		// Thêm fields từ File (optional, vì LEFT JOIN)
+		FileID   *uint  `json:"file_id,omitempty"`
+		FileName string `json:"file_name,omitempty"`
+		Url      string `json:"url,omitempty"`
+		MimeType string `json:"mime_type,omitempty"`
+		// Thêm các trường khác từ File nếu cần
 	}
 	var topItems []TopItem
-	query.Select("menu_item_id, SUM(quantity) as total_qty").
-		Group("menu_item_id").
+	query.Select("order_items.menu_item_id, menu_items.name, menu_items.description, menu_items.price, menu_items.file_id, files.file_name, files.url, files.mime_type, SUM(order_items.quantity) as total_qty").
+		Group("order_items.menu_item_id, menu_items.name, menu_items.description, menu_items.price, menu_items.file_id, files.file_name, files.url, files.mime_type"). // Group thêm các trường non-aggregate
 		Order("total_qty DESC").
 		Limit(10).
 		Scan(&topItems)
