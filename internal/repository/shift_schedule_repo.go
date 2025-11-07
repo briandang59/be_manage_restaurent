@@ -32,25 +32,15 @@ func (r *shiftScheduleRepo) FindAll(page, pageSize int, preloadFields []string, 
 	var total int64
 	offset := (page - 1) * pageSize
 
-	// 🧹 Bước 1: Xóa các bản ghi trùng lặp (cùng employee_id, shift_id, date)
-	// Giữ lại bản ghi có ID nhỏ nhất
-	if err := r.db.Exec(`
-		DELETE FROM shift_schedules
-		WHERE id NOT IN (
-			SELECT MIN(id)
-			FROM shift_schedules
-			GROUP BY employee_id, shift_id, date
-		)
-	`).Error; err != nil {
-		return nil, 0, err
-	}
+	// ❌ XÓA PHẦN DELETE NÀY – Move ra endpoint riêng /cleanup
+	// if err := r.db.Exec(`DELETE ...`).Error; err != nil { ... }
 
-	// 🧩 Bước 2: Xây dựng query lấy dữ liệu
 	query := r.db.Model(&model.ShiftSchedule{})
 	for _, field := range preloadFields {
 		query = query.Preload(field)
 	}
 
+	// Filters
 	if shiftId, ok := filters["shift_id"]; ok {
 		query = query.Where("shift_id = ?", shiftId)
 	}
@@ -58,16 +48,13 @@ func (r *shiftScheduleRepo) FindAll(page, pageSize int, preloadFields []string, 
 		query = query.Where("employee_id = ?", employeeId)
 	}
 
-	// 📊 Đếm tổng số dòng
+	// Count
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	// 📥 Lấy dữ liệu có phân trang
-	if err := query.
-		Limit(pageSize).
-		Offset(offset).
-		Find(&list).Error; err != nil {
+	// Find
+	if err := query.Limit(pageSize).Offset(offset).Find(&list).Error; err != nil {
 		return nil, 0, err
 	}
 
