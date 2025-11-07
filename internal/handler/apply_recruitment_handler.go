@@ -4,6 +4,7 @@ import (
 	"manage_restaurent/internal/dto"
 	"manage_restaurent/internal/response"
 	"manage_restaurent/internal/service"
+	"manage_restaurent/utils"
 	"net/http"
 	"strconv"
 
@@ -21,8 +22,9 @@ func NewApplyRecruitmentHandler(s *service.ApplyRecruitmentService) *ApplyRecrui
 func (h *ApplyRecruitmentHandler) GetAll(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "10"))
+	preloadFields := utils.ParsePopulateQuery(c.Request.URL.Query())
 
-	list, total, err := h.svc.List(page, pageSize, []string{"Recruitment", "CV"})
+	list, total, err := h.svc.List(page, pageSize, preloadFields)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
