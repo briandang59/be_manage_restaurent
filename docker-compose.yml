@@ -12,7 +12,7 @@ services:
       - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql
-      - ./go_db_seed_data.sql:/docker-entrypoint-initdb.d/01-seed.sql
+      - ./go_db_backup_20251110_215955.sql:/docker-entrypoint-initdb.d/01-seed.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 10s
